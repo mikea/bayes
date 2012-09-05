@@ -1,0 +1,3 @@
+[submodule "gga"]
+	path = gga
+	url = https://github.com/mikea/gga.git
