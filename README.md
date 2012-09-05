@@ -1,0 +1,4 @@
+bayes
+=====
+
+Bayesian Network Excercises
