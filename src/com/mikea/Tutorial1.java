@@ -35,7 +35,6 @@ public class Tutorial1 {
         };
 
         BayesianGraph bayesianGraph = BayesianGraph.buildFromSamples(graph, nValues, samples);
-
         System.out.println();
     }
 }
