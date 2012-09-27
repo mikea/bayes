@@ -87,4 +87,13 @@ public class VarSetTest {
             assertEquals(i, v.getIndex(v.getAssignment(i)));
         }
     }
+
+    @Test
+    public void testRemoveVars() throws Exception {
+        VarSet v1 = new VarSet(new int[]{1, 2}, new int[]{3, 2});
+        VarSet v2 = new VarSet(new int[]{2}, new int[]{2});
+
+        VarSet v = v1.removeVars(v2);
+        assertEquals("{1(3)}", v.toString());
+    }
 }

@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
 
 /**
  * @author mike.aizatsky@gmail.com
@@ -16,6 +17,47 @@ public class VarSet {
         Preconditions.checkArgument(variables.length == cardinalities.length);
         this.variables = variables;
         this.cardinalities = cardinalities;
+    }
+
+    public static VarSet product(Iterable<VarSet> varSets) {
+        BitSet variables = new BitSet();
+        for (VarSet varSet : varSets) {
+            for (int v : varSet.variables) {
+                variables.set(v);
+            }
+        }
+
+        return createFromBitset(variables, varSets);
+    }
+
+    private static VarSet createFromBitset(BitSet variables, Iterable<VarSet> cardinalitySets) {
+        int[] vars = new int[variables.cardinality()];
+        for (int i = 0, var = variables.nextSetBit(0); i < vars.length; ++i, var = variables.nextSetBit(var + 1)) {
+            vars[i] = var;
+        }
+
+        int[] cardinalities = new int[variables.cardinality()];
+        Arrays.fill(cardinalities, -1);
+        for (int i = 0; i < cardinalities.length; ++i) {
+            int var = vars[i];
+            int cardinality = -1;
+
+            for (VarSet varSet : cardinalitySets) {
+                if (varSet.hasVariable(var)) {
+                    if (cardinality == -1) cardinality = varSet.getCardinality(var);
+                    else Preconditions.checkState(cardinality == varSet.getCardinality(var));
+                }
+            }
+
+            Preconditions.checkState(cardinality > 0);
+            cardinalities[i] = cardinality;
+        }
+
+        return new VarSet(vars, cardinalities);
+    }
+
+    public static VarSet product(VarSet...varSets) {
+        return product(Arrays.asList(varSets));
     }
 
     @Override
@@ -33,39 +75,6 @@ public class VarSet {
         return result.toString();
     }
 
-    public static VarSet product(Iterable<VarSet> varSets) {
-        BitSet variables = new BitSet();
-        for (VarSet varSet : varSets) {
-            for (int v : varSet.variables) {
-                variables.set(v);
-            }
-        }
-
-        int[] vars = new int[variables.cardinality()];
-        for (int i = 0, var = variables.nextSetBit(0); i < vars.length; ++i, var = variables.nextSetBit(var + 1)) {
-            vars[i] = var;
-        }
-
-        int[] cardinalities = new int[variables.cardinality()];
-        Arrays.fill(cardinalities, -1);
-        for (int i = 0; i < cardinalities.length; ++i) {
-            int var = vars[i];
-            int cardinality = -1;
-
-            for (VarSet varSet : varSets) {
-                if (varSet.hasVariable(var)) {
-                    if (cardinality == -1) cardinality = varSet.getCardinality(var);
-                    else Preconditions.checkState(cardinality == varSet.getCardinality(var));
-                }
-            }
-
-            Preconditions.checkState(cardinality > 0);
-            cardinalities[i] = cardinality;
-        }
-
-        return new VarSet(vars, cardinalities);
-    }
-
     public int getCardinality(int var) {
         for (int i = 0; i < variables.length; i++) {
             if (variables[i] == var) return cardinalities[i];
@@ -80,10 +89,6 @@ public class VarSet {
         }
 
         return false;
-    }
-
-    public static VarSet product(VarSet...varSets) {
-        return product(Arrays.asList(varSets));
     }
 
     public int getMaxIndex() {
@@ -138,5 +143,15 @@ public class VarSet {
         return result;
     }
 
+    public VarSet removeVars(VarSet otherVars) {
+        BitSet variables = new BitSet();
+        for (int v : this.variables) {
+            variables.set(v);
+        }
+        for (int v : otherVars.variables) {
+            variables.clear(v);
+        }
 
+        return createFromBitset(variables, Collections.singletonList(this));
+    }
 }
