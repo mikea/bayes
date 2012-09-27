@@ -22,11 +22,35 @@ public class Factor {
         this.values = values;
     }
 
-    public static Factor newFactor(int[] variables, int[] cardinality, double[] values) {
-        return new Factor(new VarSet(variables, cardinality), values);
+    public static Factor createFactor(ProbabilitySpace space, int[] variables, double[] values) {
+        VarSet varSet = VarSet.createVarSet(space, variables);
+
+        // Reorder values, since variables might not be in ascending order.
+        double[] orderedValues = new double[values.length];
+        int[] cards = space.getCardinalities(variables);
+        int maxIdx = 1;
+        for (int card : cards) {
+            maxIdx *= card;
+        }
+
+        int[] assignment = new int[space.getNumberOfVariables()];
+        for (int i = 0; i < maxIdx; ++i) {
+            // First compute the assignment based on passed variables
+            int idx = i;
+            for (int var : variables) {
+                int cardinality = space.getCardinality(var);
+                int varValue = idx % cardinality;
+                assignment[var] = varValue;
+                idx = idx / cardinality;
+            }
+            // Now store value at correct index.
+            orderedValues[varSet.getIndex(assignment)] = values[i];
+        }
+
+        return createFactor(varSet, orderedValues);
     }
 
-    public static Factor newFactor(VarSet varSet, double[] values) {
+    public static Factor createFactor(VarSet varSet, double[] values) {
         return new Factor(varSet, values);
     }
 
@@ -60,7 +84,7 @@ public class Factor {
             values[i] = value;
         }
 
-        return Factor.newFactor(productVarSet, values);
+        return Factor.createFactor(productVarSet, values);
     }
 
     @Override
