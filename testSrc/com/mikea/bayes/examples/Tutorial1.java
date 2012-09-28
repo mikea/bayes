@@ -1,6 +1,6 @@
-package com.mikea;
+package com.mikea.bayes.examples;
 
-import com.mikea.bayes.BayesianGraph;
+import com.mikea.bayes.BayesianNetwork;
 import org.gga.graph.MutableGraph;
 import org.gga.graph.impl.SparseGraphImpl;
 
@@ -34,7 +34,7 @@ public class Tutorial1 {
                 {1, 2, 6, 3, 0},
         };
 
-        BayesianGraph bayesianGraph = BayesianGraph.buildFromSamples(graph, nValues, samples);
+        BayesianNetwork bayesianGraph = BayesianNetwork.buildFromSamples(graph, nValues, samples);
         System.out.println();
     }
 }
