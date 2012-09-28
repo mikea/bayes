@@ -122,4 +122,8 @@ public class VarSet implements Iterable<Integer> {
             }
         };
     }
+
+    public ProbabilitySpace getProbabilitySpace() {
+        return space;
+    }
 }

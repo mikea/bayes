@@ -67,4 +67,21 @@ public class FactorTest {
         Factor f = f2.marginalize(createVarSet(space, new int[]{2}));
         assertEquals("Factor({1}, [1.0, 1.0])", f.toString());
     }
+
+    @Test
+    public void testObserveEvidence() throws Exception {
+        Factor f1 = createFactor(space, new int[]{1}, new double[]{0.11, 0.89});
+
+        assertEquals("Factor({1}, [0.11, 0.89])", f1.observeEvidence(new int[]{}, new int[] {}).toString());
+        assertEquals("Factor({1}, [0.11, 0.0])", f1.observeEvidence(new int[]{1}, new int[] {0}).toString());
+        assertEquals("Factor({1}, [0.0, 0.89])", f1.observeEvidence(new int[]{1}, new int[] {1}).toString());
+        assertEquals("Factor({1}, [0.11, 0.89])", f1.observeEvidence(new int[]{2}, new int[] {1}).toString());
+
+        Factor f2 = createFactor(space, new int[]{2, 1}, new double[]{0.59, 0.41, 0.22, 0.78});
+        assertEquals("Factor({1, 2}, [0.59, 0.22, 0.0, 0.0])", f2.observeEvidence(new int[]{2}, new int[] {0}).toString());
+        assertEquals("Factor({1, 2}, [0.0, 0.0, 0.41, 0.78])", f2.observeEvidence(new int[]{2}, new int[] {1}).toString());
+        assertEquals("Factor({1, 2}, [0.59, 0.0, 0.41, 0.0])", f2.observeEvidence(new int[]{1}, new int[] {0}).toString());
+        assertEquals("Factor({1, 2}, [0.0, 0.22, 0.0, 0.78])", f2.observeEvidence(new int[]{1}, new int[] {1}).toString());
+        assertEquals("Factor({1, 2}, [0.0, 0.22, 0.0, 0.0])", f2.observeEvidence(new int[]{1, 2}, new int[] {1, 0}).toString());
+    }
 }

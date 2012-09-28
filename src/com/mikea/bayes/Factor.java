@@ -6,6 +6,7 @@ import com.google.common.collect.Iterables;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.BitSet;
 
 /**
  * @author mike.aizatsky@gmail.com
@@ -13,11 +14,13 @@ import java.util.Arrays;
 
 //todo: equals()
 public class Factor {
+    private final ProbabilitySpace space;
     private final VarSet varSet;
     private double[] values;
 
     private Factor(VarSet varSet, double[] values) {
         Preconditions.checkArgument(varSet.getMaxIndex() == values.length);
+        this.space = varSet.getProbabilitySpace();
         this.varSet = varSet;
         this.values = values;
     }
@@ -132,5 +135,42 @@ public class Factor {
         }
 
         return new Factor(newVarSet, newValues);
+    }
+
+    public Factor observeEvidence(int[] observedVariables, int[] observedValues) {
+        Preconditions.checkArgument(observedValues.length == observedVariables.length);
+        double[] newValues = new double[values.length];
+
+        BitSet[] allowedValues = new BitSet[space.getNumberOfVariables()];
+        for (int i = 0; i < allowedValues.length; ++i) {
+            allowedValues[i] = new BitSet();
+        }
+
+        for (int i = 0; i < observedVariables.length; i++) {
+            int observedVariable = observedVariables[i];
+            int observedValue = observedValues[i];
+            allowedValues[observedVariable].set(observedValue);
+        }
+
+        for (int i = 0; i < values.length; i++) {
+            int[] assignment = varSet.getAssignment(i);
+
+            boolean consistent = true;
+
+            for (int var = 0; var < assignment.length; var++) {
+                int val = assignment[var];
+                BitSet allowedValue = allowedValues[var];
+                if (val >= 0 && !allowedValue.isEmpty() && !allowedValue.get(val)) {
+                    consistent = false;
+                    break;
+                }
+            }
+
+            if (consistent) {
+                newValues[i] = values[i];
+            }
+        }
+
+        return new Factor(varSet, newValues);
     }
 }
