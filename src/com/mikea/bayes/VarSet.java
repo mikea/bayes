@@ -37,7 +37,7 @@ public class VarSet implements Iterable<Integer> {
         return product(Arrays.asList(varSets));
     }
 
-    public static VarSet createVarSet(ProbabilitySpace space, int[] variables) {
+    public static VarSet newVarSet(ProbabilitySpace space, int[] variables) {
         BitSet vars = new BitSet();
         for (int variable : variables) {
             vars.set(variable);
@@ -81,7 +81,7 @@ public class VarSet implements Iterable<Integer> {
             int var = vars[i];
             int cardinality = space.getCardinality(var);
             int val = assignment[var];
-            Preconditions.checkArgument(val >= 0);
+            Preconditions.checkArgument(val >= 0, "Bad assignment %s@%s for varset %s", val, var, this);
             index *= cardinality;
             index += val;
         }
@@ -110,6 +110,15 @@ public class VarSet implements Iterable<Integer> {
         return new VarSet(space, variables);
     }
 
+    public VarSet removeVars(int[] vars) {
+        BitSet variables = new BitSet();
+        variables.or(this.variables);
+        for (int var : vars) {
+            variables.clear(var);
+        }
+        return new VarSet(space, variables);
+    }
+
     @Override
     public Iterator<Integer> iterator() {
         return new AbstractIterator<Integer>() {
@@ -125,5 +134,9 @@ public class VarSet implements Iterable<Integer> {
 
     public ProbabilitySpace getProbabilitySpace() {
         return space;
+    }
+
+    public BitSet getVariables() {
+        return variables;
     }
 }

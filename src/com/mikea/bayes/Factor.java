@@ -25,16 +25,13 @@ public class Factor {
         this.values = values;
     }
 
-    public static Factor createFactor(ProbabilitySpace space, int[] variables, double[] values) {
-        VarSet varSet = VarSet.createVarSet(space, variables);
+    public static Factor newFactor(ProbabilitySpace space, int[] variables, double[] values) {
+        VarSet varSet = VarSet.newVarSet(space, variables);
+        int maxIdx = varSet.getMaxIndex();
+        Preconditions.checkArgument(values.length == maxIdx);
 
         // Reorder values, since variables might not be in ascending order.
         double[] orderedValues = new double[values.length];
-        int[] cards = space.getCardinalities(variables);
-        int maxIdx = 1;
-        for (int card : cards) {
-            maxIdx *= card;
-        }
 
         int[] assignment = new int[space.getNumberOfVariables()];
         for (int i = 0; i < maxIdx; ++i) {
@@ -172,5 +169,13 @@ public class Factor {
         }
 
         return new Factor(varSet, newValues);
+    }
+
+    public double[] getValues() {
+        return values;
+    }
+
+    public double getValue(int[] assignment) {
+        return values[varSet.getIndex(assignment)];
     }
 }
