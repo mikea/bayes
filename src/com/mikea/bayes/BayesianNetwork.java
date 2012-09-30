@@ -1,5 +1,6 @@
 package com.mikea.bayes;
 
+import com.google.common.base.Preconditions;
 import org.gga.graph.Edge;
 import org.gga.graph.Graph;
 import org.gga.graph.search.dfs.AbstractDfsVisitor;
@@ -17,6 +18,7 @@ public class BayesianNetwork {
 
     public BayesianNetwork(ProbabilitySpace space, Graph graph,
                            Factor[] factors) {
+        Preconditions.checkArgument(graph.isDirected());
         this.space = space;
         this.graph = graph;
         this.factors = factors;
@@ -102,11 +104,10 @@ public class BayesianNetwork {
                 factorVariables,
                 factor.getVarSet().getVariables());
 
-        Factor marginalizedFactor = factor.marginalize(newVarSet(space, new int[]{v}));
+        Factor marginalizedFactor = factor.marginalize(newVarSet(space, v));
 
         double[] values = marginalizedFactor.getValues();
-        for (int i = 0; i < values.length; i++) {
-            double value = values[i];
+        for (double value : values) {
             checkState(1.0 == value, "Marginalized distribution for %s should contain only 1, but is %s.", v, marginalizedFactor);
         }
     }
@@ -131,5 +132,13 @@ public class BayesianNetwork {
         }
 
         return result;
+    }
+
+    public Graph getGraph() {
+        return graph;
+    }
+
+    public ProbabilitySpace getProbabilitySpace() {
+        return space;
     }
 }

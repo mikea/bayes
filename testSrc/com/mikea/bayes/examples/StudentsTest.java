@@ -12,7 +12,7 @@ import static com.mikea.bayes.Factor.newFactor;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Applying library to Students example from Koller
+ * Applying library to Students example from Koller.
  *
  * @author mike.aizatsky@gmail.com
  */

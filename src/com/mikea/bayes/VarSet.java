@@ -30,18 +30,22 @@ public class VarSet implements Iterable<Integer> {
             variables.or(varSet.variables);
         }
 
-        return new VarSet(space, variables);
+        return newVarSet(space, variables);
     }
 
     public static VarSet product(VarSet...varSets) {
         return product(Arrays.asList(varSets));
     }
 
-    public static VarSet newVarSet(ProbabilitySpace space, int[] variables) {
+    public static VarSet newVarSet(ProbabilitySpace space, int...variables) {
         BitSet vars = new BitSet();
         for (int variable : variables) {
             vars.set(variable);
         }
+        return newVarSet(space, vars);
+    }
+
+    public static VarSet newVarSet(ProbabilitySpace space, BitSet vars) {
         return new VarSet(space, vars);
     }
 
@@ -107,7 +111,7 @@ public class VarSet implements Iterable<Integer> {
         BitSet variables = new BitSet();
         variables.or(this.variables);
         variables.andNot(otherVars.variables);
-        return new VarSet(space, variables);
+        return newVarSet(space, variables);
     }
 
     public VarSet removeVars(int[] vars) {
@@ -116,7 +120,7 @@ public class VarSet implements Iterable<Integer> {
         for (int var : vars) {
             variables.clear(var);
         }
-        return new VarSet(space, variables);
+        return newVarSet(space, variables);
     }
 
     @Override
@@ -137,6 +141,10 @@ public class VarSet implements Iterable<Integer> {
     }
 
     public BitSet getVariables() {
+        return variables;
+    }
+
+    public BitSet getBitSet() {
         return variables;
     }
 }
