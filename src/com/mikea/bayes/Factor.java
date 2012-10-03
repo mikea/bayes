@@ -7,6 +7,9 @@ import com.google.common.collect.Iterables;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Map;
+
+import static com.google.common.collect.Maps.newHashMap;
 
 /**
  * @author mike.aizatsky@gmail.com
@@ -14,44 +17,21 @@ import java.util.BitSet;
 
 //todo: equals()
 public class Factor {
-    private final ProbabilitySpace space;
     private final VarSet varSet;
     private double[] values;
 
     private Factor(VarSet varSet, double[] values) {
         Preconditions.checkArgument(varSet.getMaxIndex() == values.length);
-        this.space = varSet.getProbabilitySpace();
         this.varSet = varSet;
         this.values = values;
     }
 
-    public static Factor newFactor(ProbabilitySpace space, int[] variables, double[] values) {
-        VarSet varSet = VarSet.newVarSet(space, variables);
-        int maxIdx = varSet.getMaxIndex();
-        Preconditions.checkArgument(values.length == maxIdx);
-
-        // Reorder values, since variables might not be in ascending order.
-        double[] orderedValues = new double[values.length];
-
-        int[] assignment = new int[space.getNumberOfVariables()];
-        for (int i = 0; i < maxIdx; ++i) {
-            // First compute the assignment based on passed variables
-            int idx = i;
-            for (int var : variables) {
-                int cardinality = space.getCardinality(var);
-                int varValue = idx % cardinality;
-                assignment[var] = varValue;
-                idx = idx / cardinality;
-            }
-            // Now store value at correct index.
-            orderedValues[varSet.getIndex(assignment)] = values[i];
-        }
-
-        return createFactor(varSet, orderedValues);
+    public static Factor newFactor(VarSet varSet, double[] values) {
+        return new Factor(varSet, values);
     }
 
-    public static Factor createFactor(VarSet varSet, double[] values) {
-        return new Factor(varSet, values);
+    public static Factor newFactor(Var[] vars, double[] doubles) {
+        return newFactor(VarSet.newVarSet(vars), doubles);
     }
 
     public static Factor product(Factor...factors) {
@@ -84,7 +64,7 @@ public class Factor {
             values[i] = value;
         }
 
-        return Factor.createFactor(productVarSet, values);
+        return Factor.newFactor(productVarSet, values);
     }
 
     @Override
@@ -127,37 +107,35 @@ public class Factor {
         double[] newValues = new double[newVarSet.getMaxIndex()];
 
         for (int i = 0; i < values.length; ++i) {
-            int[] assignment = varSet.getAssignment(i);
+            VarAssignment assignment = varSet.getAssignment(i);
             newValues[newVarSet.getIndex(assignment)] += values[i];
         }
 
         return new Factor(newVarSet, newValues);
     }
 
-    public Factor observeEvidence(int[] observedVariables, int[] observedValues) {
+    public Factor observeEvidence(Var[] observedVariables, int[] observedValues) {
         Preconditions.checkArgument(observedValues.length == observedVariables.length);
         double[] newValues = new double[values.length];
 
-        BitSet[] allowedValues = new BitSet[space.getNumberOfVariables()];
-        for (int i = 0; i < allowedValues.length; ++i) {
-            allowedValues[i] = new BitSet();
+        Map<Var, BitSet> allowedValues = newHashMap();
+        for (Var observedVariable : observedVariables) {
+            allowedValues.put(observedVariable, new BitSet());
         }
 
         for (int i = 0; i < observedVariables.length; i++) {
-            int observedVariable = observedVariables[i];
-            int observedValue = observedValues[i];
-            allowedValues[observedVariable].set(observedValue);
+            allowedValues.get(observedVariables[i]).set(observedValues[i]);
         }
 
         for (int i = 0; i < values.length; i++) {
-            int[] assignment = varSet.getAssignment(i);
+            VarAssignment assignment = varSet.getAssignment(i);
 
             boolean consistent = true;
 
-            for (int var = 0; var < assignment.length; var++) {
-                int val = assignment[var];
-                BitSet allowedValue = allowedValues[var];
-                if (val >= 0 && !allowedValue.isEmpty() && !allowedValue.get(val)) {
+            for (Var var : assignment) {
+                int val = assignment.get(var);
+                BitSet allowedValue = allowedValues.get(var);
+                if (val >= 0 && allowedValue != null && !allowedValue.isEmpty() && !allowedValue.get(val)) {
                     consistent = false;
                     break;
                 }
@@ -171,11 +149,21 @@ public class Factor {
         return new Factor(varSet, newValues);
     }
 
+
+
     public double[] getValues() {
         return values;
     }
 
-    public double getValue(int[] assignment) {
+    public double getValue(VarAssignment assignment) {
         return values[varSet.getIndex(assignment)];
+    }
+
+    public double getValue(Var[] vars, int[] values) {
+        return getValue(new VarAssignment(vars, values));
+    }
+
+    public double getValue(VarAssignment.VarAssignmentBuilder builder) {
+        return getValue(builder.build());
     }
 }

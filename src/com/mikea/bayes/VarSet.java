@@ -2,51 +2,37 @@ package com.mikea.bayes;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Iterator;
+import java.util.*;
+
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * @author mike.aizatsky@gmail.com
  */
-public class VarSet implements Iterable<Integer> {
-    private final ProbabilitySpace space;
-    private final BitSet variables;
+public class VarSet implements Iterable<Var> {
+    private final Var[] vars;
+    private final Set<Var> set;
 
-    private VarSet(ProbabilitySpace space, BitSet variables) {
-        this.space = space;
-        Preconditions.checkArgument(variables.length() <= space.getNumberOfVariables());
-        this.variables = variables;
+    private VarSet(Var[] vars) {
+        this.vars = vars;
+        this.set = newHashSet(vars);
     }
 
     public static VarSet product(Iterable<VarSet> varSets) {
         Preconditions.checkArgument(!Iterables.isEmpty(varSets));
-        ProbabilitySpace space = Iterables.getFirst(varSets, null).space;
-        BitSet variables = new BitSet();
+        Set<Var> variables = newHashSet();
         for (VarSet varSet : varSets) {
-            variables.or(varSet.variables);
+            variables.addAll(varSet.set);
         }
 
-        return newVarSet(space, variables);
+        return newVarSet(variables);
     }
 
     public static VarSet product(VarSet...varSets) {
         return product(Arrays.asList(varSets));
-    }
-
-    public static VarSet newVarSet(ProbabilitySpace space, int...variables) {
-        BitSet vars = new BitSet();
-        for (int variable : variables) {
-            vars.set(variable);
-        }
-        return newVarSet(space, vars);
-    }
-
-    public static VarSet newVarSet(ProbabilitySpace space, BitSet vars) {
-        return new VarSet(space, vars);
     }
 
     @Override
@@ -57,14 +43,14 @@ public class VarSet implements Iterable<Integer> {
         return result.toString();
     }
 
-    public boolean hasVariable(int var) {
-        return variables.get(var);
+    public boolean hasVariable(Var var) {
+        return set.contains(var);
     }
 
     public int getMaxIndex() {
         int result = 1;
-        for (Integer var : this) {
-            result *= space.getCardinality(var);
+        for (Var var : this) {
+            result *= var.getCardinality();
         }
         return result;
     }
@@ -73,78 +59,84 @@ public class VarSet implements Iterable<Integer> {
      * Transform an index from varSet into our own value index.
      */
     public int transformIndex(int i, VarSet varSet) {
-        int[] assignment = varSet.getAssignment(i);
+        VarAssignment assignment = varSet.getAssignment(i);
         return getIndex(assignment);
     }
 
-    int getIndex(int[] assignment) {
+    int getIndex(VarAssignment assignment) {
         int index = 0;
-        Integer[] vars = Iterables.toArray(this, Integer.class);
+
+        Preconditions.checkArgument(assignment.containsAll(this.vars),
+                "Assignment %s do not match this %s", assignment, this);
 
         for (int i = vars.length - 1; i >= 0; --i) {
-            int var = vars[i];
-            int cardinality = space.getCardinality(var);
-            int val = assignment[var];
-            Preconditions.checkArgument(val >= 0, "Bad assignment %s@%s for varset %s", val, var, this);
+            Var var = vars[i];
+            int cardinality = var.getCardinality();
+            int val = assignment.get(var);
+            Preconditions.checkArgument(val >= 0, "Bad assignment %s@%s for set %s (full assignment: %s)", val, var, this, assignment);
             index *= cardinality;
             index += val;
         }
         return index;
     }
 
-    int[] getAssignment(int idx) {
+    VarAssignment getAssignment(int idx) {
         Preconditions.checkArgument(idx < getMaxIndex());
-        int[] assignment = new int[space.getNumberOfVariables()];
-        Arrays.fill(assignment, -1);
+        int[] values = new int[vars.length];
+        Arrays.fill(values, -1);
 
-        for (Integer var : this) {
-            int cardinality = space.getCardinality(var);
+        for (int i = 0; i < vars.length; i++) {
+            Var var = vars[i];
+            int cardinality = var.getCardinality();
             int varValue = idx % cardinality;
-            assignment[var] = varValue;
+            values[i] = varValue;
             idx = idx / cardinality;
         }
 
-        return assignment;
+        return new VarAssignment(vars, values);
     }
 
     public VarSet removeVars(VarSet otherVars) {
-        BitSet variables = new BitSet();
-        variables.or(this.variables);
-        variables.andNot(otherVars.variables);
-        return newVarSet(space, variables);
+        return newVarSet(Sets.difference(set, otherVars.set));
     }
 
-    public VarSet removeVars(int[] vars) {
-        BitSet variables = new BitSet();
-        variables.or(this.variables);
-        for (int var : vars) {
-            variables.clear(var);
-        }
-        return newVarSet(space, variables);
+    public VarSet removeVars(Var...vars) {
+        return newVarSet(Sets.difference(set, Sets.newHashSet(vars)));
     }
 
     @Override
-    public Iterator<Integer> iterator() {
-        return new AbstractIterator<Integer>() {
-            private int idx = -1;
-            @Override
-            protected Integer computeNext() {
-                idx = variables.nextSetBit(idx + 1);
-                if (idx < 0) return endOfData();
-                return idx;
-            }
-        };
+    public Iterator<Var> iterator() {
+        return Arrays.asList(vars).iterator();
     }
 
-    public ProbabilitySpace getProbabilitySpace() {
-        return space;
+    public static VarSet newVarSet(Var...vars) {
+        return new VarSet(vars);
     }
 
-    public BitSet getVariables() {
-        return variables;
+    public static VarSet newVarSet(Set<Var> vars) {
+        Var[] varArray = vars.toArray(new Var[vars.size()]);
+        Arrays.sort(varArray, Var.BY_NAME);
+        return new VarSet(varArray);
     }
 
-    public BitSet getBitSet() {
-        return variables;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+
+        if (o instanceof VarSet) {
+            VarSet vars = (VarSet) o;
+            return set.equals(vars.set);
+        }
+        if (o instanceof Set) {
+            return set.equals(o);
+        }
+
+        throw new IllegalArgumentException(o.getClass().getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return set.hashCode();
     }
 }

@@ -2,8 +2,7 @@ package com.mikea.bayes;
 
 import org.junit.Test;
 
-import java.util.Arrays;
-
+import static com.mikea.bayes.Var.newVar;
 import static com.mikea.bayes.VarSet.newVarSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -12,68 +11,67 @@ import static org.junit.Assert.assertTrue;
  * @author mike.aizatsky@gmail.com
  */
 public class VarSetTest {
-    private static final ProbabilitySpace space = new ProbabilitySpace(
-            4, new int[]{1, 2, 2, 3});
+    private static final Var var0 = newVar("0", 1);
+    private static final Var var1 = newVar("1", 2);
+    private static final Var var2 = newVar("2", 2);
+    private static final Var var3 = newVar("3", 3);
 
     @Test
     public void testToString() throws Exception {
-        VarSet v1 = newVarSet(space, new int[]{1});
-        VarSet v2 = newVarSet(space, new int[]{2, 1});
-        VarSet v3 = newVarSet(space, new int[]{3, 2});
+        VarSet v1 = newVarSet(var1);
+        VarSet v2 = newVarSet(var2, var1);
+        VarSet v3 = newVarSet(var3, var2);
 
-        assertEquals("{1}", v1.toString());
-        assertEquals("{1, 2}", v2.toString());
-        assertEquals("{2, 3}", v3.toString());
+        assertEquals("{1(2)}", v1.toString());
+        assertEquals("{2(2), 1(2)}", v2.toString());
+        assertEquals("{3(3), 2(2)}", v3.toString());
     }
 
     @Test
     public void testHasVariable() throws Exception {
-        VarSet v = newVarSet(space, new int[]{2, 1});
+        VarSet v = newVarSet(var2, var1);
 
-        assertTrue(v.hasVariable(1));
-        assertTrue(v.hasVariable(2));
-        assertTrue(!v.hasVariable(3));
+        assertTrue(v.hasVariable(var1));
+        assertTrue(v.hasVariable(var2));
+        assertTrue(!v.hasVariable(var3));
     }
 
     @Test
     public void testProduct() throws Exception {
-        VarSet v1 = newVarSet(space, new int[]{1});
-        VarSet v2 = newVarSet(space, new int[]{2, 1});
-        VarSet v3 = newVarSet(space, new int[]{3, 2});
+        VarSet v1 = newVarSet(var1);
+        VarSet v2 = newVarSet(var2, var1);
+        VarSet v3 = newVarSet(var3, var2);
 
-        assertEquals("{1, 2}", VarSet.product(v1, v2).toString());
-        assertEquals("{1, 2, 3}", VarSet.product(v1, v3).toString());
-        assertEquals("{1, 2, 3}", VarSet.product(v2, v3).toString());
-        assertEquals("{1, 2, 3}", VarSet.product(v1, v2, v3).toString());
+        assertEquals("{1(2), 2(2)}", VarSet.product(v1, v2).toString());
+        assertEquals("{1(2), 2(2), 3(3)}", VarSet.product(v1, v3).toString());
+        assertEquals("{1(2), 2(2), 3(3)}", VarSet.product(v2, v3).toString());
+        assertEquals("{1(2), 2(2), 3(3)}", VarSet.product(v1, v2, v3).toString());
     }
 
     @Test
     public void testGetAssignment() throws Exception {
-        VarSet v = newVarSet(space, new int[]{1});
-        assertEquals("[-1, 0, -1, -1]", Arrays.toString(v.getAssignment(0)));
+        VarSet v = newVarSet(var1);
+        assertEquals("{1=0}", v.getAssignment(0).toString());
+        assertEquals("{1=1}", v.getAssignment(1).toString());
 
-        v = newVarSet(space, new int[]{1});
-        assertEquals("[-1, 0, -1, -1]", Arrays.toString(v.getAssignment(0)));
-        assertEquals("[-1, 1, -1, -1]", Arrays.toString(v.getAssignment(1)));
-
-        v = newVarSet(space, new int[]{1, 3});
-        assertEquals("[-1, 0, -1, 0]", Arrays.toString(v.getAssignment(0)));
-        assertEquals("[-1, 1, -1, 0]", Arrays.toString(v.getAssignment(1)));
-        assertEquals("[-1, 0, -1, 1]", Arrays.toString(v.getAssignment(2)));
-        assertEquals("[-1, 1, -1, 1]", Arrays.toString(v.getAssignment(3)));
-        assertEquals("[-1, 0, -1, 2]", Arrays.toString(v.getAssignment(4)));
-        assertEquals("[-1, 1, -1, 2]", Arrays.toString(v.getAssignment(5)));
+        v = newVarSet(var1, var3);
+        assertEquals("{1=0, 3=0}", v.getAssignment(0).toString());
+        assertEquals("{1=1, 3=0}", v.getAssignment(1).toString());
+        assertEquals("{1=0, 3=1}", v.getAssignment(2).toString());
+        assertEquals("{1=1, 3=1}", v.getAssignment(3).toString());
+        assertEquals("{1=0, 3=2}", v.getAssignment(4).toString());
+        assertEquals("{1=1, 3=2}", v.getAssignment(5).toString());
     }
 
     @Test
     public void testGetIndex() throws Exception {
-        VarSet v = newVarSet(space, new int[]{1});
+        VarSet v = newVarSet(var1);
         verifyGetIndex(v);
 
-        v = newVarSet(space, new int[]{1});
+        v = newVarSet(var1);
         verifyGetIndex(v);
 
-        v = newVarSet(space, new int[]{0, 3});
+        v = newVarSet(var0, var3);
         verifyGetIndex(v);
     }
 
@@ -85,10 +83,9 @@ public class VarSetTest {
 
     @Test
     public void testRemoveVars() throws Exception {
-        VarSet v1 = newVarSet(space, new int[]{1, 2});
-        VarSet v2 = newVarSet(space, new int[]{2});
+        VarSet v1 = newVarSet(var1, var2);
+        VarSet v2 = newVarSet(var2);
 
-        VarSet v = v1.removeVars(v2);
-        assertEquals("{1}", v.toString());
+        assertEquals("{1(2)}", v1.removeVars(v2).toString());
     }
 }
