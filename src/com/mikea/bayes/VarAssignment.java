@@ -60,15 +60,15 @@ public class VarAssignment implements Iterable<Var> {
         return true;
     }
 
-    public static VarAssignmentBuilder at(Var var, int value) {
-        return new VarAssignmentBuilder().at(var, value);
+    public static Builder at(Var var, int value) {
+        return new Builder().at(var, value);
     }
 
-    public static class VarAssignmentBuilder {
+    public static class Builder {
         private List<Var> vars = newArrayList();
         private List<Integer> values = newArrayList();
 
-        public VarAssignmentBuilder at(Var var, int value) {
+        public Builder at(Var var, int value) {
             vars.add(var);
             values.add(value);
             return this;

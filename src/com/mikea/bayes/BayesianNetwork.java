@@ -3,32 +3,33 @@ package com.mikea.bayes;
 import com.google.common.base.Preconditions;
 import org.gga.graph.Edge;
 import org.gga.graph.Graph;
+import org.gga.graph.impl.DataGraphImpl;
 import org.gga.graph.search.dfs.AbstractDfsVisitor;
 import org.gga.graph.sort.TopologicalSort;
+import org.gga.graph.util.Pair;
 
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.mikea.bayes.VarSet.newVarSet;
 
 public class BayesianNetwork {
-    private final Graph graph;
+    private final DataGraphImpl<Var, Void> graph;
     private final Factor[] factors;
-    private final Var[] vars;
 
-    // TODO: should be a data graph.
-    public BayesianNetwork(Graph graph,
-                           Var[] vars,
-                           Factor[] factors) {
-        this.vars = vars;
+    // TODO: move factors into datagraph.
+    private BayesianNetwork(DataGraphImpl<Var, Void> graph,
+                            Factor[] factors) {
         Preconditions.checkArgument(graph.isDirected());
         this.graph = graph;
         this.factors = factors;
     }
 
     public static BayesianNetwork buildFromSamples(Graph graph, int[] nValues, int[][] samples) {
+        // TODO: implement
         throw new UnsupportedOperationException();
 /*
         int root = 0;
@@ -86,7 +87,7 @@ public class BayesianNetwork {
             factorVariables.put(var, s);
         }
 
-        graph.getDfs().depthFirstSearch(new AbstractDfsVisitor() {
+        graph.getIntGraph().getDfs().depthFirstSearch(new AbstractDfsVisitor() {
             @Override
             public void examineEdge(Edge e, Graph graph) {
                 Var w = getVar(e.w());
@@ -109,7 +110,7 @@ public class BayesianNetwork {
                 factorVariables,
                 factor.getVarSet());
 
-        Factor marginalizedFactor = factor.marginalize(newVarSet(vars[v]));
+        Factor marginalizedFactor = factor.marginalize(newVarSet(getVar(v)));
 
         double[] values = marginalizedFactor.getValues();
         for (double value : values) {
@@ -118,7 +119,7 @@ public class BayesianNetwork {
     }
 
     public Factor computeJointDistribution() {
-        int[] vertices = TopologicalSort.sort(graph);
+        int[] vertices = TopologicalSort.sort(graph.getIntGraph());
         Factor result = factors[vertices[0]];
         for (int i = 1; i < vertices.length; ++i) {
             result = result.product(factors[vertices[i]]);
@@ -126,12 +127,8 @@ public class BayesianNetwork {
         return result;
     }
 
-    public double computeProbability(int[] values) {
-        return computeProbability(new VarAssignment(vars, values));
-    }
-
     public double computeProbability(VarAssignment assignment) {
-        int[] vertices = TopologicalSort.sort(graph);
+        int[] vertices = TopologicalSort.sort(graph.getIntGraph());
         double result = 1;
 
         for (int v : vertices) {
@@ -144,18 +141,62 @@ public class BayesianNetwork {
     }
 
     public Graph getGraph() {
-        return graph;
+        return graph.getIntGraph();
     }
 
     public Var getVar(int j) {
-        return vars[j];
+        return graph.getNode(j);
     }
 
     public int getVarIndex(Var observation) {
-        for (int i = 0; i < vars.length; i++) {
-            Var var = vars[i];
-            if (var == observation) return i;
+        return graph.getIndex(observation);
+    }
+
+    public static Builder withVariables(Var...vars) {
+        return new Builder().withVariables(vars);
+    }
+
+    public double computeProbability(VarAssignment.Builder at) {
+        return computeProbability(at.build());
+    }
+
+    public static class Builder {
+        private Var[] vars;
+        private final List<Pair<Var, Var>> edges = newArrayList();
+        private final Map<Var, Factor> factors = newHashMap();
+
+        public Builder withVariables(Var[] vars) {
+            this.vars = vars;
+            return this;
         }
-        throw new NoSuchElementException();
+
+        public BayesianNetwork build() {
+            DataGraphImpl<Var, Void> g = new DataGraphImpl<Var, Void>(vars.length, true);
+            for (int i = 0; i < vars.length; i++) {
+                g.setNode(i, vars[i]);
+            }
+
+            for (Pair<Var, Var> edge : edges) {
+                g.insert(edge.first, edge.second, null);
+            }
+
+            Factor[] factorArray = new Factor[vars.length];
+            for (int i = 0; i < vars.length; i++) {
+                Var var = vars[i];
+                factorArray[i] = factors.get(var);
+            }
+
+            return new BayesianNetwork(g, factorArray);
+        }
+
+        public Builder edge(Var from, Var to) {
+            edges.add(Pair.of(from, to));
+            return this;
+        }
+
+        public Builder factor(Var var, Factor factor) {
+            factors.put(var, factor);
+            return this;
+        }
     }
 }

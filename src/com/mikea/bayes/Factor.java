@@ -163,7 +163,7 @@ public class Factor {
         return getValue(new VarAssignment(vars, values));
     }
 
-    public double getValue(VarAssignment.VarAssignmentBuilder builder) {
+    public double getValue(VarAssignment.Builder builder) {
         return getValue(builder.build());
     }
 }

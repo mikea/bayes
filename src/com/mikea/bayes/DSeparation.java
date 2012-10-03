@@ -14,7 +14,7 @@ import java.util.Set;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.mikea.bayes.VarSet.newVarSet;
-import static org.gga.graph.util.Pair.newPairOf;
+import static org.gga.graph.util.Pair.of;
 
 /**
  * @author mike.aizatsky@gmail.com
@@ -24,13 +24,13 @@ public class DSeparation {
      * Find all variables that are d-separated from sourceVariable given observations.
      */
     public static VarSet findDSeparation(BayesianNetwork network,
-                                         int sourceVariable,
+                                         Var sourceVariable,
                                          VarSet observations) {
         BitSet observationBitSet = new BitSet();
         for (Var observation : observations) {
             observationBitSet.set(network.getVarIndex(observation));
         }
-        BitSet bitSet = findDSeparated(network.getGraph(), sourceVariable, observationBitSet);
+        BitSet bitSet = findDSeparated(network.getGraph(), network.getVarIndex(sourceVariable), observationBitSet);
         Set<Var> vars = newHashSet();
         for (int i = bitSet.nextSetBit(0); i >= 0; i = bitSet.nextSetBit(i + 1)) {
             vars.add(network.getVar(i));
@@ -123,11 +123,11 @@ public class DSeparation {
         List<Pair<Integer, Integer>> result = newArrayList();
 
         for (int i = 0; i < network.getGraph().V(); ++i) {
-            VarSet dSeparation = findDSeparation(network, i, observation);
+            VarSet dSeparation = findDSeparation(network, network.getVar(i), observation);
 
             for (int j = i + 1; j < network.getGraph().V(); j++) {
                 if (dSeparation.hasVariable(network.getVar(j))) {
-                    result.add(newPairOf(i, j));
+                    result.add(of(i, j));
                 }
             }
         }
