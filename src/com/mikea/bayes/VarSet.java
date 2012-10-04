@@ -139,4 +139,12 @@ public class VarSet implements Iterable<Var> {
     public int hashCode() {
         return set.hashCode();
     }
+
+    public Iterable<VarAssignment> assignments() {
+        VarAssignment[] assignments = new VarAssignment[getMaxIndex()];
+        for (int i = 0; i < assignments.length; i++) {
+            assignments[i] = getAssignment(i);
+        }
+        return Arrays.asList(assignments);
+    }
 }
