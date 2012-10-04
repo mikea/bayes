@@ -64,11 +64,26 @@ public class VarAssignment implements Iterable<Var> {
         return new Builder().at(var, value);
     }
 
+    public boolean contains(Var var) {
+        for (Var v : vars) {
+            if (v == var) return true;
+        }
+        return false;
+    }
+
     public static class Builder {
         private List<Var> vars = newArrayList();
         private List<Integer> values = newArrayList();
 
         public Builder at(Var var, int value) {
+            for (int i = 0; i < vars.size(); i++) {
+                Var v =  vars.get(i);
+                if (v == var) {
+                    values.set(i, value);
+                    return this;
+                }
+            }
+
             vars.add(var);
             values.add(value);
             return this;

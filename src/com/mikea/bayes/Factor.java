@@ -9,7 +9,9 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Maps.newHashMap;
+import static com.mikea.bayes.VarSet.newVarSet;
 
 /**
  * @author mike.aizatsky@gmail.com
@@ -21,7 +23,7 @@ public class Factor {
     private double[] values;
 
     private Factor(VarSet varSet, double[] values) {
-        Preconditions.checkArgument(varSet.getMaxIndex() == values.length);
+        checkArgument(varSet.getMaxIndex() == values.length);
         this.varSet = varSet;
         this.values = values;
     }
@@ -31,7 +33,7 @@ public class Factor {
     }
 
     public static Factor newFactor(Var[] vars, double[] doubles) {
-        return newFactor(VarSet.newVarSet(vars), doubles);
+        return newFactor(newVarSet(vars), doubles);
     }
 
     public static Factor product(Factor...factors) {
@@ -115,7 +117,7 @@ public class Factor {
     }
 
     public Factor observeEvidence(Var[] observedVariables, int[] observedValues) {
-        Preconditions.checkArgument(observedValues.length == observedVariables.length);
+        checkArgument(observedValues.length == observedVariables.length);
         double[] newValues = new double[values.length];
 
         Map<Var, BitSet> allowedValues = newHashMap();
@@ -165,5 +167,35 @@ public class Factor {
 
     public double getValue(VarAssignment.Builder builder) {
         return getValue(builder.build());
+    }
+
+    public static Builder withVariables(Var... vars) {
+        return new Builder().withVariables(vars);
+    }
+
+    public static class Builder {
+        private VarSet varSet;
+        private double[] values;
+
+        public Builder withVariables(Var[] vars) {
+            this.varSet = newVarSet(vars);
+            this.values = new double[varSet.getMaxIndex()];
+            return this;
+        }
+
+        public Builder line(Var var, VarAssignment.Builder assignment, double[] values) {
+            checkArgument(!assignment.build().contains(var));
+            for (int val = 0; val < var.getCardinality(); ++val) {
+                VarAssignment a = assignment.at(var, val).build();
+                int idx = varSet.getIndex(a);
+                this.values[idx] = values[val];
+            }
+
+            return this;
+        }
+
+        public Factor build() {
+            return newFactor(varSet, values);
+        }
     }
 }
