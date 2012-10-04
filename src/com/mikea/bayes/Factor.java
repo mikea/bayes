@@ -20,7 +20,7 @@ import static com.mikea.bayes.VarSet.newVarSet;
 //todo: equals()
 public class Factor {
     private final VarSet varSet;
-    private double[] values;
+    private final double[] values;
 
     private Factor(VarSet varSet, double[] values) {
         checkArgument(varSet.getMaxIndex() == values.length);

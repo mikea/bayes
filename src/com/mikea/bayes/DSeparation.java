@@ -41,9 +41,9 @@ public class DSeparation {
     /**
      * Find all variables that are d-separated from sourceVariable given observations.
      */
-    public static BitSet findDSeparated(Graph g,
-                                        int sourceVariable,
-                                        BitSet observations) {
+    private static BitSet findDSeparated(Graph g,
+                                         int sourceVariable,
+                                         BitSet observations) {
         BitSet activeNodes = new BitSet();
         activeNodes.or(observations);
         int[] topologicalSort = TopologicalSort.sort(g);

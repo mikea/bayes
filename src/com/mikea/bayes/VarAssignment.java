@@ -11,8 +11,8 @@ import static com.google.common.collect.Lists.newArrayList;
  * @author mike.aizatsky@gmail.com
  */
 public class VarAssignment implements Iterable<Var> {
-    // TODO: varset?
-    final Var[] vars;
+    // TODO: varSet?
+    private final Var[] vars;
     private final int[] values;
 
     public VarAssignment(Var[] vars, int[] values) {
@@ -89,8 +89,8 @@ public class VarAssignment implements Iterable<Var> {
     }
 
     public static class Builder {
-        private List<Var> vars = newArrayList();
-        private List<Integer> values = newArrayList();
+        private final List<Var> vars = newArrayList();
+        private final List<Integer> values = newArrayList();
 
         public Builder at(Var var, int value) {
             for (int i = 0; i < vars.size(); i++) {

@@ -20,7 +20,7 @@ public class BayesianNetwork {
     private final DataGraphImpl<Var, Void> graph;
     private final Factor[] factors;
 
-    // TODO: move factors into datagraph.
+    // TODO: move factors into dataGraph.
     private BayesianNetwork(DataGraphImpl<Var, Void> graph,
                             Factor[] factors) {
         Preconditions.checkArgument(graph.isDirected());
