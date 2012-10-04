@@ -102,7 +102,7 @@ public class Factor {
     }
 
     /**
-     * sum out vars.
+     * Sum out vars.
      */
     public Factor marginalize(VarSet vars) {
         VarSet newVarSet = varSet.removeVars(vars);
@@ -173,6 +173,44 @@ public class Factor {
         return new Builder().withVariables(vars);
     }
 
+    /**
+     * Normalize value for every possible assignment of vars.
+     */
+    public Factor normalizeBy(Var...vars) {
+        Factor scale = marginalize(varSet.removeVars(vars));
+
+        double[] newValues = new double[values.length];
+        for (int i = 0; i < values.length; i++) {
+            VarAssignment assignment = varSet.getAssignment(i);
+            newValues[i] = values[i] / scale.getValue(assignment);
+        }
+
+        return new Factor(varSet, newValues);
+    }
+
+    public String toString(Var rowsVar, String valueFormat) {
+        StringBuilder result = new StringBuilder();
+        result.append("Factor(");
+        result.append(varSet);
+        result.append("):\n");
+        VarSet rowsVarSet = varSet.removeVars(rowsVar);
+
+        for (VarAssignment rowAssignment : rowsVarSet.assignments()) {
+            result.append(rowAssignment.toString());
+            result.append(": ");
+
+            for (int i = 0; i < rowsVar.getCardinality(); ++i) {
+                if (i > 0) result.append(" ");
+                VarAssignment assignment = rowAssignment.set(rowsVar, i);
+                result.append(String.format(valueFormat, getValue(assignment)));
+            }
+            result.append("\n");
+        }
+
+
+        return result.toString();
+    }
+
     public static class Builder {
         private VarSet varSet;
         private double[] values;
@@ -183,10 +221,13 @@ public class Factor {
             return this;
         }
 
-        public Builder line(Var var, VarAssignment.Builder assignment, double[] values) {
-            checkArgument(!assignment.build().contains(var));
+        public Builder row(Var var, VarAssignment.Builder assignmentBuilder, double[] values) {
+            checkArgument(values.length == var.getCardinality());
+            VarAssignment assignment = assignmentBuilder.build();
+            checkArgument(!assignment.contains(var));
+
             for (int val = 0; val < var.getCardinality(); ++val) {
-                VarAssignment a = assignment.at(var, val).build();
+                VarAssignment a = assignment.set(var, val);
                 int idx = varSet.getIndex(a);
                 this.values[idx] = values[val];
             }
@@ -196,6 +237,13 @@ public class Factor {
 
         public Factor build() {
             return newFactor(varSet, values);
+        }
+
+        public Builder add(VarAssignment.Builder at, double value) {
+            VarAssignment assignment = at.build();
+            int idx = varSet.getIndex(assignment);
+            this.values[idx] += value;
+            return this;
         }
     }
 }
