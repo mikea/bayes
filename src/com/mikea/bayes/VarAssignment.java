@@ -71,6 +71,23 @@ public class VarAssignment implements Iterable<Var> {
         return false;
     }
 
+    public VarAssignment set(Var var, int value) {
+        for (int i = 0; i < vars.length; i++) {
+            Var v = vars[i];
+            if (v == var) {
+                int[] newValues = Arrays.copyOf(values, values.length);
+                newValues[i] = value;
+                return new VarAssignment(vars, newValues);
+            }
+        }
+
+        Var[] newVars = Arrays.copyOf(vars, vars.length + 1);
+        newVars[vars.length] = var;
+        int[] newValues = Arrays.copyOf(values, values.length + 1);
+        newValues[values.length] = value;
+        return new VarAssignment(newVars, newValues);
+    }
+
     public static class Builder {
         private List<Var> vars = newArrayList();
         private List<Integer> values = newArrayList();
