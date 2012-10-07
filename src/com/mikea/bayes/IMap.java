@@ -1,21 +1,25 @@
 package com.mikea.bayes;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.gga.graph.util.Pair;
 
+import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 import static com.mikea.bayes.VarSet.newVarSet;
 
 /**
  * @author mike.aizatsky@gmail.com
  */
 public class IMap {
-    private final List<Independence> independences;  // todo: independencies?
+    private final Set<Independence> independences;  // todo: independencies?
 
-    public IMap(List<Independence> independences) {
+    public IMap(Set<Independence> independences) {
         this.independences = independences;
     }
 
@@ -23,7 +27,7 @@ public class IMap {
         Set<Var> vars = network.getVars();
 
         Set<Set<Var>> allPossibleObservations = Sets.powerSet(vars);
-        List<Independence> independences = newArrayList();
+        Set<Independence> independences = newHashSet();
 
 
         for (Set<Var> observation : allPossibleObservations) {
@@ -39,7 +43,38 @@ public class IMap {
 
     @Override
     public String toString() {
-        return independences.toString();
+        Iterable<String> strings = Iterables.transform(independences, new Function<Independence, String>() {
+            @Nullable
+            @Override
+            public String apply(@Nullable Independence input) {
+                return input != null ? input.toString() : null;
+            }
+        });
+
+        String[] stringsArray = Iterables.toArray(strings, String.class);
+        Arrays.sort(stringsArray);
+        return Arrays.toString(stringsArray);
+    }
+
+    public boolean contains(IMap otherMap) {
+        return independences.containsAll(otherMap.independences);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        IMap iMap = (IMap) o;
+
+        if (!independences.equals(iMap.independences)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return independences.hashCode();
     }
 
     public static class Independence {
@@ -56,6 +91,28 @@ public class IMap {
         @Override
         public String toString() {
             return "(" + var1.getName() + " \u22A5 " + var2.getName() + " | " + observation.toString(false) + ")";
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Independence that = (Independence) o;
+
+            if (!observation.equals(that.observation)) return false;
+            if (!var1.equals(that.var1)) return false;
+            if (!var2.equals(that.var2)) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = var1.hashCode();
+            result = 31 * result + var2.hashCode();
+            result = 31 * result + observation.hashCode();
+            return result;
         }
     }
 }
