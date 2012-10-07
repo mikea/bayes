@@ -123,10 +123,18 @@ public class DSeparation {
         List<Pair<Integer, Integer>> result = newArrayList();
 
         for (int i = 0; i < network.getGraph().V(); ++i) {
-            VarSet dSeparation = findDSeparation(network, network.getVar(i), observation);
+            Var v1 = network.getVar(i);
+            if (observation.hasVariable(v1)) {
+                continue;
+            }
+            VarSet dSeparation = findDSeparation(network, v1, observation);
 
             for (int j = i + 1; j < network.getGraph().V(); j++) {
-                if (dSeparation.hasVariable(network.getVar(j))) {
+                Var v2 = network.getVar(j);
+                if (observation.hasVariable(v2)) {
+                    continue;
+                }
+                if (dSeparation.hasVariable(v2)) {
                     result.add(of(i, j));
                 }
             }

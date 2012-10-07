@@ -160,6 +160,15 @@ public class BayesianNetwork {
         return computeProbability(at.build());
     }
 
+    public Set<Var> getVars() {
+        Set<Var> vars = newHashSet();
+        for (int i = 0; i < graph.V(); i++) {
+            vars.add(graph.getNode(i));
+        }
+
+        return Collections.unmodifiableSet(vars);
+    }
+
     public static class Builder {
         private Var[] vars;
         private final List<Pair<Var, Var>> edges = newArrayList();

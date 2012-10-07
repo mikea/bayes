@@ -1,11 +1,12 @@
 package com.mikea.bayes;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -37,11 +38,29 @@ public class VarSet implements Iterable<Var> {
 
     @Override
     public String toString() {
+        return toString(true);
+    }
+
+    public String toString(boolean showCardinalities) {
         StringBuilder result = new StringBuilder("{");
-        result.append(Joiner.on(", ").join(this));
+
+        for (int i = 0; i < vars.length; i++) {
+            if (i > 0) result.append(", ");
+            Var var = vars[i];
+            result.append(var.getName());
+
+            if (showCardinalities) {
+                result.append("(");
+                result.append(var.getCardinality());
+                result.append(")");
+            }
+        }
+
         result.append("}");
         return result.toString();
     }
+
+
 
     public boolean hasVariable(Var var) {
         return set.contains(var);
