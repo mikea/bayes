@@ -159,15 +159,29 @@ public class BayesianNetwork {
         return Collections.unmodifiableSet(vars);
     }
 
-    public Factor query(Var queryVar) {
+    public Factor query(Var...queryVars) {
+        return query(newVarSet(queryVars));
+    }
+
+    public Factor query(VarSet query) {
+        return query(query, new Var[]{}, new int[]{});
+    }
+
+    public Factor query(VarSet query, Var[] observedVariables, int[] observedValues) {
         List<Var> vars = newArrayList();
+
         int[] order = TopologicalSort.sort(graph.getIntGraph());
 
         for (int i = 0; i < graph.V(); i++) {
             Var var = graph.getNode(order[i]);
-            if (var != queryVar) {
+            if (!query.contains(var)) {
                 vars.add(var);
             }
+        }
+
+        List<Factor> factors = newArrayList();
+        for (Factor factor : this.factors) {
+            factors.add(factor.observeEvidence(observedVariables, observedValues));
         }
 
         return Factor.sumProductVariableElimination(vars, newArrayList(factors)).normalize();

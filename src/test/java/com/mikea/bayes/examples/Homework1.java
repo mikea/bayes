@@ -1,6 +1,9 @@
 package com.mikea.bayes.examples;
 
-import com.mikea.bayes.*;
+import com.mikea.bayes.BayesianNetwork;
+import com.mikea.bayes.DSeparation;
+import com.mikea.bayes.Factor;
+import com.mikea.bayes.Var;
 import org.junit.Test;
 
 import static com.mikea.bayes.Factor.newFactor;
@@ -45,14 +48,11 @@ public class Homework1 {
                 .factor(A, fa)
                 .factor(T, ft)
                 .build();
-        Factor jointDistribution = network.computeJointDistribution();
-
-        VarSet marginalizedA = jointDistribution.getScope().removeVars(A);
 
         assertEquals("Factor({A(2)}, [0.6521739130434783, 0.3478260869565217])",
-                jointDistribution.observeEvidence(vars(T), new int[]{1}).marginalize(marginalizedA).normalize().toString());
+                network.query(newVarSet(A), vars(T), new int[]{1}).toString());
         assertEquals("Factor({A(2)}, [0.8571428571428572, 0.14285714285714288])",
-                jointDistribution.observeEvidence(vars(T, P), new int[]{1, 1}).marginalize(marginalizedA).normalize().toString());
+                network.query(newVarSet(A), vars(T, P), new int[]{1, 1}).toString());
     }
 
     @Test

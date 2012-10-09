@@ -164,6 +164,7 @@ public class Factor {
 
     public Factor observeEvidence(Var[] observedVariables, int[] observedValues) {
         checkArgument(observedValues.length == observedVariables.length);
+        if (observedValues.length == 0) { return this; }
         double[] newValues = new double[values.length];
 
         Map<Var, BitSet> allowedValues = newHashMap();
@@ -246,7 +247,8 @@ public class Factor {
         List<Factor> result = newArrayList();
         List<Factor> product = newArrayList();
         for (Factor factor : factors) {
-            if (factor.getScope().contains(var)) {
+            VarSet scope = factor.getScope();
+            if (scope.contains(var)) {
                 product.add(factor);
             } else {
                 result.add(factor);

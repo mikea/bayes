@@ -2,6 +2,7 @@ package com.mikea.bayes;
 
 import org.junit.Test;
 
+import static com.mikea.bayes.VarSet.newVarSet;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -24,7 +25,7 @@ public class BayesianNetworkTest {
 
             Factor factor = Factor
                     .withVariables(vars[i], vars[i - 1])
-                    .uniform(0.5)
+                    .uniform(0.25)
                     .build();
             networkBuilder = networkBuilder.factor(vars[i - 1], factor);
         }
@@ -33,9 +34,9 @@ public class BayesianNetworkTest {
         networkBuilder.factor(lastVar, Factor.withVariables(lastVar).uniform(0.5).build());
 
         BayesianNetwork network = networkBuilder.build();
-        Var queryVar = vars[0];
 
-        Factor f = network.query(queryVar);
-        assertEquals("Factor({0(2)}, [0.5, 0.5])", f.toString());
+        assertEquals("Factor({0(2)}, [0.5, 0.5])", network.query(vars[0]).toString());
+        assertEquals("Factor({0(2), 1(2)}, [0.25, 0.25, 0.25, 0.25])", network.query(vars[0], vars[1]).toString());
+        assertEquals("Factor({0(2)}, [0.5, 0.5])", network.query(newVarSet(vars[0]), new Var[] {vars[1]}, new int[] {0}).toString());
     }
 }
