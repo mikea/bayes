@@ -1,6 +1,8 @@
 package com.mikea.bayes;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
@@ -14,12 +16,13 @@ import static com.google.common.collect.Sets.newHashSet;
  * @author mike.aizatsky@gmail.com
  */
 public class VarSet implements Iterable<Var> {
+    // todo: use ImmutableSortedSet.
     private final Var[] vars;
     private final Set<Var> set;
 
     private VarSet(Var[] vars) {
         this.vars = vars;
-        this.set = newHashSet(vars);
+        this.set = ImmutableSet.copyOf(vars);
     }
 
     public static VarSet product(Iterable<VarSet> varSets) {
@@ -47,13 +50,7 @@ public class VarSet implements Iterable<Var> {
         for (int i = 0; i < vars.length; i++) {
             if (i > 0) result.append(", ");
             Var var = vars[i];
-            result.append(var.getName());
-
-            if (showCardinalities) {
-                result.append("(");
-                result.append(var.getCardinality());
-                result.append(")");
-            }
+            result.append(var.toString(showCardinalities));
         }
 
         result.append("}");
@@ -156,7 +153,7 @@ public class VarSet implements Iterable<Var> {
 
     @Override
     public int hashCode() {
-        return set.hashCode();
+        return Objects.hashCode(set);
     }
 
     public Iterable<VarAssignment> assignments() {

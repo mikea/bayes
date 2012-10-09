@@ -1,6 +1,7 @@
 package com.mikea.bayes;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.gga.graph.util.Pair;
@@ -32,9 +33,9 @@ public class IMap {
 
         for (Set<Var> observation : allPossibleObservations) {
             VarSet varSet = newVarSet(observation);
-            List<Pair<Integer,Integer>> dSeparatedPairs = DSeparation.findAllDSeparatedPairs(network, varSet);
-            for (Pair<Integer, Integer> pair : dSeparatedPairs) {
-                independences.add(new Independence(network.getVar(pair.first), network.getVar(pair.second), varSet));
+            List<Pair<Var, Var>> dSeparatedPairs = DSeparation.findAllDSeparatedPairs(network, varSet);
+            for (Pair<Var, Var> pair : dSeparatedPairs) {
+                independences.add(new Independence(pair.first, pair.second, varSet));
             }
         }
 
@@ -43,6 +44,7 @@ public class IMap {
 
     @Override
     public String toString() {
+
         Iterable<String> strings = Iterables.transform(independences, new Function<Independence, String>() {
             @Nullable
             @Override
@@ -65,16 +67,13 @@ public class IMap {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        IMap iMap = (IMap) o;
-
-        if (!independences.equals(iMap.independences)) return false;
-
-        return true;
+        IMap that = (IMap) o;
+        return Objects.equal(independences, that.independences);
     }
 
     @Override
     public int hashCode() {
-        return independences.hashCode();
+        return Objects.hashCode(independences);
     }
 
     public static class Independence {
@@ -100,19 +99,14 @@ public class IMap {
 
             Independence that = (Independence) o;
 
-            if (!observation.equals(that.observation)) return false;
-            if (!var1.equals(that.var1)) return false;
-            if (!var2.equals(that.var2)) return false;
-
-            return true;
+            return Objects.equal(observation, that.observation) &&
+                    Objects.equal(var1, that.var1) &&
+                    Objects.equal(var2, that.var2);
         }
 
         @Override
         public int hashCode() {
-            int result = var1.hashCode();
-            result = 31 * result + var2.hashCode();
-            result = 31 * result + observation.hashCode();
-            return result;
+            return Objects.hashCode(var1, var2, observation);
         }
     }
 }

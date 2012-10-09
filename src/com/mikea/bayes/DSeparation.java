@@ -119,8 +119,8 @@ public class DSeparation {
         return reachable;
     }
 
-    public static List<Pair<Integer, Integer>> findAllDSeparatedPairs(BayesianNetwork network, VarSet observation) {
-        List<Pair<Integer, Integer>> result = newArrayList();
+    public static List<Pair<Var, Var>> findAllDSeparatedPairs(BayesianNetwork network, VarSet observation) {
+        List<Pair<Var, Var>> result = newArrayList();
 
         for (int i = 0; i < network.getGraph().V(); ++i) {
             Var v1 = network.getVar(i);
@@ -135,7 +135,7 @@ public class DSeparation {
                     continue;
                 }
                 if (dSeparation.hasVariable(v2)) {
-                    result.add(of(i, j));
+                    result.add(of(v1, v2));
                 }
             }
         }

@@ -47,8 +47,8 @@ public class DSeparationTest {
                 .edge(B, D)
                 .edge(C, E)
                 .build();
-        Assert.assertEquals("[(0, 1), (0, 3)]", DSeparation.findAllDSeparatedPairs(network, newVarSet()).toString());
-        Assert.assertEquals("[(0, 4), (1, 4), (2, 4), (3, 4)]",
+        Assert.assertEquals("[(A, B), (A, D)]", DSeparation.findAllDSeparatedPairs(network, newVarSet()).toString());
+        Assert.assertEquals("[]",
                 DSeparation.findAllDSeparatedPairs(network, newVarSet(E)).toString());
     }
 }

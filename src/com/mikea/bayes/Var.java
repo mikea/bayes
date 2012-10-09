@@ -35,7 +35,12 @@ public class Var {
 
     @Override
     public String toString() {
-        return name + "(" + card + ")";
+        return toString(false);
+    }
+
+    public String toString(boolean showCardinality) {
+        if (!showCardinality) return name;
+        else return name + "(" + card + ")";
     }
 
     /**
