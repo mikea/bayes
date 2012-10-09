@@ -120,6 +120,7 @@ public class DSeparation {
     }
 
     public static List<Pair<Var, Var>> findAllDSeparatedPairs(BayesianNetwork network, VarSet observation) {
+        // TODO: this is not a really efficient algorithm. (see Koller exercise 3.28)
         List<Pair<Var, Var>> result = newArrayList();
 
         for (int i = 0; i < network.getGraph().V(); ++i) {

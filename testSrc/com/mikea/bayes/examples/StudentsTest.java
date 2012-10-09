@@ -85,9 +85,9 @@ public class StudentsTest {
                 vars(D, I, G, S, L),
                 new int[]{0, 1, 1, 1, 0}), 1e-5);
 
-        VarSet marginalizedL = f.getVarSet().removeVars(L);
-        VarSet marginalizedI = f.getVarSet().removeVars(I);
-        VarSet marginalizedD = f.getVarSet().removeVars(D);
+        VarSet marginalizedL = f.getScope().removeVars(L);
+        VarSet marginalizedI = f.getScope().removeVars(I);
+        VarSet marginalizedD = f.getScope().removeVars(D);
 
         // Compute P(L)
         Factor lDistribution = f.marginalize(marginalizedL);

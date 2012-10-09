@@ -8,8 +8,10 @@ import org.gga.graph.search.dfs.AbstractDfsVisitor;
 import org.gga.graph.sort.TopologicalSort;
 import org.gga.graph.util.Pair;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -17,12 +19,14 @@ import static com.google.common.collect.Sets.newHashSet;
 import static com.mikea.bayes.VarSet.newVarSet;
 
 public class BayesianNetwork {
+    @Nonnull
     private final DataGraphImpl<Var, Void> graph;
+    @Nonnull
     private final Factor[] factors;
 
     // TODO: move factors into dataGraph.
-    private BayesianNetwork(DataGraphImpl<Var, Void> graph,
-                            Factor[] factors) {
+    private BayesianNetwork(@Nonnull DataGraphImpl<Var, Void> graph,
+                            @Nonnull Factor[] factors) {
         Preconditions.checkArgument(graph.isDirected());
         this.graph = graph;
         this.factors = factors;
@@ -104,11 +108,11 @@ public class BayesianNetwork {
     }
 
     private void validateFactor(int v, Factor factor, Set<Var> factorVariables) {
-        checkState(factor.getVarSet().equals(factorVariables),
+        checkState(factor.getScope().equals(factorVariables),
                 "Factor variables for vertex %s do not match graph structure. Expected: %s, actual: %s",
                 v,
                 factorVariables,
-                factor.getVarSet());
+                factor.getScope());
 
         Factor marginalizedFactor = factor.marginalize(newVarSet(getVar(v)));
 
@@ -145,7 +149,7 @@ public class BayesianNetwork {
     }
 
     public Var getVar(int j) {
-        return graph.getNode(j);
+        return checkNotNull(graph.getNode(j));
     }
 
     public int getVarIndex(Var observation) {

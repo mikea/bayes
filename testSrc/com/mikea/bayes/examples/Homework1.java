@@ -48,7 +48,7 @@ public class Homework1 {
                 .build();
         Factor jointDistribution = network.computeJointDistribution();
 
-        VarSet marginalizedA = jointDistribution.getVarSet().removeVars(A);
+        VarSet marginalizedA = jointDistribution.getScope().removeVars(A);
 
         assertEquals("Factor({A(2)}, [0.6521739130434783, 0.3478260869565217])",
                 jointDistribution.observeEvidence(vars(T), new int[]{1}).marginalize(marginalizedA).normalize().toString());

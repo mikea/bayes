@@ -19,12 +19,12 @@ import static com.mikea.bayes.VarSet.newVarSet;
 
 //todo: equals()
 public class Factor {
-    private final VarSet varSet;
+    private final VarSet scope;
     private final double[] values;
 
-    private Factor(VarSet varSet, double[] values) {
-        checkArgument(varSet.getMaxIndex() == values.length);
-        this.varSet = varSet;
+    private Factor(VarSet scope, double[] values) {
+        checkArgument(scope.getMaxIndex() == values.length);
+        this.scope = scope;
         this.values = values;
     }
 
@@ -46,7 +46,7 @@ public class Factor {
             @Override
             public VarSet apply(@Nullable Factor factor) {
                 assert factor != null;
-                return factor.getVarSet();
+                return factor.getScope();
             }
         });
 
@@ -58,7 +58,7 @@ public class Factor {
             double value = 1;
 
             for (Factor factor : factors) {
-                VarSet varSet = factor.getVarSet();
+                VarSet varSet = factor.getScope();
                 int j = varSet.transformIndex(i, productVarSet);
                 value *= factor.values[j];
             }
@@ -71,15 +71,15 @@ public class Factor {
 
     @Override
     public String toString() {
-        return "Factor(" + varSet + ", " + Arrays.toString(values) + ")";
+        return "Factor(" + scope + ", " + Arrays.toString(values) + ")";
     }
 
     public Factor product(Factor f2) {
         return product(this, f2);
     }
 
-    public VarSet getVarSet() {
-        return varSet;
+    public VarSet getScope() {
+        return scope;
     }
 
     public double sum() {
@@ -98,18 +98,18 @@ public class Factor {
             newValues[i] = values[i] / sum;
         }
 
-        return new Factor(varSet, newValues);
+        return new Factor(scope, newValues);
     }
 
     /**
      * Sum out vars.
      */
     public Factor marginalize(VarSet vars) {
-        VarSet newVarSet = varSet.removeVars(vars);
+        VarSet newVarSet = scope.removeVars(vars);
         double[] newValues = new double[newVarSet.getMaxIndex()];
 
         for (int i = 0; i < values.length; ++i) {
-            VarAssignment assignment = varSet.getAssignment(i);
+            VarAssignment assignment = scope.getAssignment(i);
             newValues[newVarSet.getIndex(assignment)] += values[i];
         }
 
@@ -130,7 +130,7 @@ public class Factor {
         }
 
         for (int i = 0; i < values.length; i++) {
-            VarAssignment assignment = varSet.getAssignment(i);
+            VarAssignment assignment = scope.getAssignment(i);
 
             boolean consistent = true;
 
@@ -148,7 +148,7 @@ public class Factor {
             }
         }
 
-        return new Factor(varSet, newValues);
+        return new Factor(scope, newValues);
     }
 
 
@@ -158,7 +158,7 @@ public class Factor {
     }
 
     public double getValue(VarAssignment assignment) {
-        return values[varSet.getIndex(assignment)];
+        return values[scope.getIndex(assignment)];
     }
 
     public double getValue(Var[] vars, int[] values) {
@@ -177,23 +177,23 @@ public class Factor {
      * Normalize value for every possible assignment of vars.
      */
     public Factor normalizeBy(Var...vars) {
-        Factor scale = marginalize(varSet.removeVars(vars));
+        Factor scale = marginalize(scope.removeVars(vars));
 
         double[] newValues = new double[values.length];
         for (int i = 0; i < values.length; i++) {
-            VarAssignment assignment = varSet.getAssignment(i);
+            VarAssignment assignment = scope.getAssignment(i);
             newValues[i] = values[i] / scale.getValue(assignment);
         }
 
-        return new Factor(varSet, newValues);
+        return new Factor(scope, newValues);
     }
 
     public String toString(Var rowsVar, String valueFormat) {
         StringBuilder result = new StringBuilder();
         result.append("Factor(");
-        result.append(varSet);
+        result.append(scope);
         result.append("):\n");
-        VarSet rowsVarSet = varSet.removeVars(rowsVar);
+        VarSet rowsVarSet = scope.removeVars(rowsVar);
 
         for (VarAssignment rowAssignment : rowsVarSet.assignments()) {
             result.append(rowAssignment.toString());
