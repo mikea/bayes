@@ -158,6 +158,13 @@ public class BayesianNetwork {
         return Collections.unmodifiableSet(vars);
     }
 
+    public Factor query(Var queryVar) {
+        VarSet allVars = newVarSet(getVars());
+        VarSet otherVars = allVars.removeVars(queryVar);
+
+        return computeJointDistribution().marginalize(otherVars).normalize();
+    }
+
     public static class Builder {
         private Var[] vars;
         private final List<Pair<Var, Var>> edges = newArrayList();

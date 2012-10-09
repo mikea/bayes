@@ -267,5 +267,10 @@ public class Factor {
             this.values[idx] = value;
             return this;
         }
+
+        public Builder uniform(double v) {
+            Arrays.fill(values, v);
+            return this;
+        }
     }
 }
