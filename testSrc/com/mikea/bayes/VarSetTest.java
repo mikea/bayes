@@ -2,7 +2,6 @@ package com.mikea.bayes;
 
 import org.junit.Test;
 
-import static com.mikea.bayes.Var.newVar;
 import static com.mikea.bayes.VarSet.newVarSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -11,10 +10,10 @@ import static org.junit.Assert.assertTrue;
  * @author mike.aizatsky@gmail.com
  */
 public class VarSetTest {
-    private static final Var var0 = newVar("0", 1);
-    private static final Var var1 = newVar("1", 2);
-    private static final Var var2 = newVar("2", 2);
-    private static final Var var3 = newVar("3", 3);
+    private static final Var var0 = new Var("0", 1);
+    private static final Var var1 = new Var("1", 2);
+    private static final Var var2 = new Var("2", 2);
+    private static final Var var3 = new Var("3", 3);
 
     @Test
     public void testToString() throws Exception {

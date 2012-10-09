@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import static com.mikea.bayes.Factor.newFactor;
 import static com.mikea.bayes.Factor.product;
-import static com.mikea.bayes.Var.newVar;
 import static com.mikea.bayes.Var.vars;
 import static com.mikea.bayes.VarSet.newVarSet;
 import static org.junit.Assert.assertEquals;
@@ -13,9 +12,9 @@ import static org.junit.Assert.assertEquals;
  * @author mike.aizatsky@gmail.com
  */
 public class FactorTest {
-    private static final Var var1 = newVar("1", 2);
-    private static final Var var2 = newVar("2", 2);
-    private static final Var var3 = newVar("3", 2);
+    private static final Var var1 = new Var("1", 2);
+    private static final Var var2 = new Var("2", 2);
+    private static final Var var3 = new Var("3", 2);
 
     @Test
     public void testToString() throws Exception {

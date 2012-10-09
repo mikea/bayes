@@ -20,13 +20,9 @@ public class Var {
     private final String name;
     private final int card;
 
-    private Var(String name, int card) {
+    public Var(String name, int card) {
         this.name = name;
         this.card = card;
-    }
-
-    public static Var newVar(String name, int card) {
-        return new Var(name, card);
     }
 
     public int getCardinality() {

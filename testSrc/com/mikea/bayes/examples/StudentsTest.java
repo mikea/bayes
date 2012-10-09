@@ -7,7 +7,6 @@ import com.mikea.bayes.VarSet;
 import org.junit.Test;
 
 import static com.mikea.bayes.Factor.newFactor;
-import static com.mikea.bayes.Var.newVar;
 import static com.mikea.bayes.Var.vars;
 import static com.mikea.bayes.VarAssignment.at;
 import static org.junit.Assert.assertEquals;
@@ -18,11 +17,11 @@ import static org.junit.Assert.assertEquals;
  * @author mike.aizatsky@gmail.com
  */
 public class StudentsTest {
-    private static final Var D = newVar("D", 2);
-    private static final Var I = newVar("I", 2);
-    private static final Var G = newVar("G", 3);
-    private static final Var S = newVar("S", 2);
-    private static final Var L = newVar("L", 2);
+    private static final Var D = new Var("D", 2);
+    private static final Var I = new Var("I", 2);
+    private static final Var G = new Var("G", 3);
+    private static final Var S = new Var("S", 2);
+    private static final Var L = new Var("L", 2);
 
     private static BayesianNetwork buildNetwork() {
         Factor factorD = newFactor(vars(D), new double[]{0.6, 0.4});
@@ -89,30 +88,32 @@ public class StudentsTest {
         VarSet marginalizedI = f.getScope().removeVars(I);
         VarSet marginalizedD = f.getScope().removeVars(D);
 
+        // TODO: use boolean comparisons
+
         // Compute P(L)
         Factor lDistribution = f.marginalize(marginalizedL);
         assertEquals(
-                "Factor({L(2)}, [0.4976639999999999, 0.5023359999999999])",
+                "Factor({L(2)}, [0.497664, 0.5023359999999999])",
                 lDistribution.toString());
 
         // Compute P(L|i0)
         assertEquals(
-                "Factor({L(2)}, [0.6114, 0.3886])",
+                "Factor({L(2)}, [0.6113999999999999, 0.38859999999999995])",
                 f.observeEvidence(vars(I), new int[]{0}).marginalize(marginalizedL).normalize().toString());
 
         // Compute P(L|i0, d0)
         assertEquals(
-                "Factor({L(2)}, [0.48699999999999993, 0.5130000000000001])",
+                "Factor({L(2)}, [0.48699999999999993, 0.513])",
                 f.observeEvidence(vars(I, D), new int[]{0, 0}).marginalize(marginalizedL).normalize().toString());
 
         // Compute P(I)
         assertEquals(
-                "Factor({I(2)}, [0.7000000000000001, 0.3])",
+                "Factor({I(2)}, [0.7000000000000001, 0.30000000000000004])",
                 f.marginalize(marginalizedI).normalize().toString());
 
         // Compute P(I|g3), P(D|g3)
         assertEquals(
-                "Factor({I(2)}, [0.9210526315789473, 0.07894736842105267])",
+                "Factor({I(2)}, [0.9210526315789473, 0.07894736842105265])",
                 f.observeEvidence(vars(G), new int[]{2}).marginalize(marginalizedI).normalize().toString());
         assertEquals(
                 "Factor({D(2)}, [0.37070938215102983, 0.6292906178489702])",
@@ -120,13 +121,13 @@ public class StudentsTest {
 
         // Compute P(I|l0), P(I|g3, l0), P(I|g3, s1)
         assertEquals(
-                "Factor({I(2)}, [0.8599778163580247, 0.14002218364197533])",
+                "Factor({I(2)}, [0.8599778163580246, 0.14002218364197533])",
                 f.observeEvidence(vars(L), new int[]{0}).marginalize(marginalizedI).normalize().toString());
         assertEquals(
-                "Factor({I(2)}, [0.9210526315789473, 0.07894736842105265])",
+                "Factor({I(2)}, [0.9210526315789473, 0.07894736842105264])",
                 f.observeEvidence(vars(G, L), new int[]{2, 0}).marginalize(marginalizedI).normalize().toString());
         assertEquals(
-                "Factor({I(2)}, [0.4216867469879517, 0.5783132530120483])",
+                "Factor({I(2)}, [0.4216867469879517, 0.5783132530120482])",
                 f.observeEvidence(vars(G, S), new int[]{2, 1}).marginalize(marginalizedI).normalize().toString());
     }
 }

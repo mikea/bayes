@@ -2,7 +2,6 @@ package com.mikea.bayes;
 
 import org.junit.Test;
 
-import static com.mikea.bayes.Var.newVar;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -12,11 +11,11 @@ public class IMapTest {
     @Test
     public void testImap1() throws Exception {
         // A, B, C, D, E
-        Var A = newVar("A",  2);
-        Var B = newVar("B",  2);
-        Var C = newVar("C",  2);
-        Var D = newVar("D",  2);
-        Var E = newVar("E",  2);
+        Var A = new Var("A", 2);
+        Var B = new Var("B", 2);
+        Var C = new Var("C", 2);
+        Var D = new Var("D", 2);
+        Var E = new Var("E", 2);
 
         BayesianNetwork network = BayesianNetwork
                 .withVariables(A, B, C, D, E)

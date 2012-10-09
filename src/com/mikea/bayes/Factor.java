@@ -41,6 +41,7 @@ public class Factor {
         return product(Arrays.asList(factors));
     }
 
+    // todo: this should be part of FactorProduct?
     public static Factor product(Iterable<Factor> factors) {
         Iterable<VarSet> varSets = Iterables.transform(factors, new Function<Factor, VarSet>() {
             @Override
@@ -74,6 +75,45 @@ public class Factor {
         return "Factor(" + scope + ", " + Arrays.toString(values) + ")";
     }
 
+    public String toStringAsTable(String valueFormat) {
+        StringBuilder result = new StringBuilder();
+        result.append("Factor(");
+        result.append(scope);
+        result.append("):\n");
+
+        for (VarAssignment assignment : scope.assignments()) {
+            result.append(assignment.toString());
+            result.append(": ");
+            result.append(String.format(valueFormat, getValue(assignment)));
+            result.append("\n");
+        }
+        return result.toString();
+    }
+
+    public String toStringAsTable(Var rowsVar, String valueFormat) {
+        StringBuilder result = new StringBuilder();
+        result.append("Factor(");
+        result.append(scope);
+        result.append("):\n");
+        VarSet rowsVarSet = scope.removeVars(rowsVar);
+
+        for (VarAssignment rowAssignment : rowsVarSet.assignments()) {
+            result.append(rowAssignment.toString());
+            result.append(": ");
+
+            for (int i = 0; i < rowsVar.getCardinality(); ++i) {
+                if (i > 0) result.append(" ");
+                VarAssignment assignment = rowAssignment.set(rowsVar, i);
+                result.append(String.format(valueFormat, getValue(assignment)));
+            }
+            result.append("\n");
+        }
+
+
+        return result.toString();
+    }
+
+    // todo: remove this method.
     public Factor product(Factor f2) {
         return product(this, f2);
     }
@@ -151,8 +191,6 @@ public class Factor {
         return new Factor(scope, newValues);
     }
 
-
-
     public double[] getValues() {
         return values;
     }
@@ -188,29 +226,6 @@ public class Factor {
         return new Factor(scope, newValues);
     }
 
-    public String toString(Var rowsVar, String valueFormat) {
-        StringBuilder result = new StringBuilder();
-        result.append("Factor(");
-        result.append(scope);
-        result.append("):\n");
-        VarSet rowsVarSet = scope.removeVars(rowsVar);
-
-        for (VarAssignment rowAssignment : rowsVarSet.assignments()) {
-            result.append(rowAssignment.toString());
-            result.append(": ");
-
-            for (int i = 0; i < rowsVar.getCardinality(); ++i) {
-                if (i > 0) result.append(" ");
-                VarAssignment assignment = rowAssignment.set(rowsVar, i);
-                result.append(String.format(valueFormat, getValue(assignment)));
-            }
-            result.append("\n");
-        }
-
-
-        return result.toString();
-    }
-
     public static class Builder {
         private VarSet varSet;
         private double[] values;
@@ -243,6 +258,13 @@ public class Factor {
             VarAssignment assignment = at.build();
             int idx = varSet.getIndex(assignment);
             this.values[idx] += value;
+            return this;
+        }
+
+        public Builder set(VarAssignment.Builder at, double value) {
+            VarAssignment assignment = at.build();
+            int idx = varSet.getIndex(assignment);
+            this.values[idx] = value;
             return this;
         }
     }

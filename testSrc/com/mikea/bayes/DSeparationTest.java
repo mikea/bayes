@@ -3,7 +3,6 @@ package com.mikea.bayes;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static com.mikea.bayes.Var.newVar;
 import static com.mikea.bayes.VarSet.newVarSet;
 
 /**
@@ -13,10 +12,10 @@ public class DSeparationTest {
     @Test
     public void testGraph1() throws Exception {
         // Example 3.6 in Koller
-        Var W = newVar("W",  2);
-        Var X = newVar("X",  2);
-        Var Y = newVar("Y",  2);
-        Var Z = newVar("Z",  2);
+        Var W = new Var("W", 2);
+        Var X = new Var("X", 2);
+        Var Y = new Var("Y", 2);
+        Var Z = new Var("Z", 2);
 
         BayesianNetwork network = BayesianNetwork
                 .withVariables(W, X, Y, Z)
@@ -33,11 +32,11 @@ public class DSeparationTest {
     @Test
     public void testGraph2() throws Exception {
         // A, B, C, D, E
-        Var A = newVar("A",  2);
-        Var B = newVar("B",  2);
-        Var C = newVar("C",  2);
-        Var D = newVar("D",  2);
-        Var E = newVar("E",  2);
+        Var A = new Var("A", 2);
+        Var B = new Var("B", 2);
+        Var C = new Var("C", 2);
+        Var D = new Var("D", 2);
+        Var E = new Var("E", 2);
 
         BayesianNetwork network = BayesianNetwork
                 .withVariables(A, B, C, D, E)

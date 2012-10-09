@@ -4,7 +4,6 @@ import com.mikea.bayes.*;
 import org.junit.Test;
 
 import static com.mikea.bayes.Factor.newFactor;
-import static com.mikea.bayes.Var.newVar;
 import static com.mikea.bayes.Var.vars;
 import static com.mikea.bayes.VarSet.newVarSet;
 import static org.junit.Assert.assertEquals;
@@ -19,9 +18,9 @@ public class Homework1 {
     @Test
     public void testInterCasualReasoning() throws Exception {
         // P, A, T
-        Var P = newVar("P",  2);
-        Var A = newVar("A",  2);
-        Var T = newVar("T",  2);
+        Var P = new Var("P", 2);
+        Var A = new Var("A", 2);
+        Var T = new Var("T", 2);
 
         Factor fp = newFactor(vars(P), new double[]{0.99, 0.01});
         Factor fa = newFactor(vars(A), new double[]{0.9, 0.1});
@@ -59,11 +58,11 @@ public class Homework1 {
     @Test
     public void testDSeparation() throws Exception {
         // A, B, C, D, E
-        Var A = newVar("A",  2);
-        Var B = newVar("B",  2);
-        Var C = newVar("C",  2);
-        Var D = newVar("D",  2);
-        Var E = newVar("E",  2);
+        Var A = new Var("A", 2);
+        Var B = new Var("B", 2);
+        Var C = new Var("C", 2);
+        Var D = new Var("D", 2);
+        Var E = new Var("E", 2);
 
         BayesianNetwork network = BayesianNetwork
                 .withVariables(A, B, C, D, E)

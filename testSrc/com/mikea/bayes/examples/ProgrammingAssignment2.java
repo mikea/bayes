@@ -6,7 +6,6 @@ import com.mikea.bayes.VarAssignment;
 import org.junit.Test;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.mikea.bayes.Var.newVar;
 import static com.mikea.bayes.VarAssignment.at;
 import static org.junit.Assert.assertEquals;
 
@@ -19,8 +18,8 @@ import static org.junit.Assert.assertEquals;
 public class ProgrammingAssignment2 {
     @Test
     public void testPhenotypeGivenGenotypeMendelianFactor() throws Exception {
-        Var genotype = newVar("genotype", 3);
-        Var phenotype = newVar("phenotype", 2);
+        Var genotype = new Var("genotype", 3);
+        Var phenotype = new Var("phenotype", 2);
 
         assertEquals("Factor({phenotype(2), genotype(3)}, [0.0, 1.0, 0.0, 1.0, 1.0, 0.0])",
                 getPhenotypeGivenGenotypeMendelianFactor(true, genotype, phenotype).toString());
@@ -31,8 +30,8 @@ public class ProgrammingAssignment2 {
 
     @Test
     public void testPhenotypeGivenGenotypeFactor() throws Exception {
-        Var genotype = newVar("genotype", 3);
-        Var phenotype = newVar("phenotype", 2);
+        Var genotype = new Var("genotype", 3);
+        Var phenotype = new Var("phenotype", 2);
 
         assertEquals("Factor({phenotype(2), genotype(3)}, [0.19999999999999996, 0.8, 0.4, 0.6, 0.9, 0.1])",
                 getPhenotypeGivenGenotypeFactor(genotype, phenotype, new double[] {0.8, 0.6, 0.1}).toString());
@@ -40,16 +39,16 @@ public class ProgrammingAssignment2 {
 
     @Test
     public void testGenotypeGivenAlleleFreqsFactor() throws Exception {
-        Var genotype = newVar("genotype", 3);
+        Var genotype = new Var("genotype", 3);
         assertEquals("Factor({genotype(3)}, [0.010000000000000002, 0.18000000000000002, 0.81])",
                 getGenotypeGivenAlleleFreqsFactor(genotype, new double[]{0.1, 0.9}).toString());
     }
 
     @Test
     public void testGenotypeGivenParentsGenotypesFactor() throws Exception {
-        Var genotypeParent1 = newVar("p1", 3);
-        Var genotypeParent2 = newVar("p2", 3);
-        Var genotypeChild = newVar("c", 3);
+        Var genotypeParent1 = new Var("p1", 3);
+        Var genotypeParent2 = new Var("p2", 3);
+        Var genotypeChild = new Var("c", 3);
 
         assertEquals(
                 "Factor({c(3), p1(3), p2(3)}):\n" +
@@ -62,7 +61,7 @@ public class ProgrammingAssignment2 {
                 "{p1=0, p2=2}: 0.00 1.00 0.00\n" +
                 "{p1=1, p2=2}: 0.00 0.50 0.50\n" +
                 "{p1=2, p2=2}: 0.00 0.00 1.00\n",
-                getGenotypeGivenParentsGenotypesFactor(genotypeChild, genotypeParent1, genotypeParent2, 2).toString(genotypeChild, "%1.2f"));
+                getGenotypeGivenParentsGenotypesFactor(genotypeChild, genotypeParent1, genotypeParent2, 2).toStringAsTable(genotypeChild, "%1.2f"));
     }
 
     @Test

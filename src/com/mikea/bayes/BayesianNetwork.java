@@ -5,7 +5,6 @@ import org.gga.graph.Edge;
 import org.gga.graph.Graph;
 import org.gga.graph.impl.DataGraphImpl;
 import org.gga.graph.search.dfs.AbstractDfsVisitor;
-import org.gga.graph.sort.TopologicalSort;
 import org.gga.graph.util.Pair;
 
 import javax.annotation.Nonnull;
@@ -123,25 +122,11 @@ public class BayesianNetwork {
     }
 
     public Factor computeJointDistribution() {
-        int[] vertices = TopologicalSort.sort(graph.getIntGraph());
-        Factor result = factors[vertices[0]];
-        for (int i = 1; i < vertices.length; ++i) {
-            result = result.product(factors[vertices[i]]);
-        }
-        return result;
+        return new FactorProduct(factors).compute();
     }
 
     public double computeProbability(VarAssignment assignment) {
-        int[] vertices = TopologicalSort.sort(graph.getIntGraph());
-        double result = 1;
-
-        for (int v : vertices) {
-            Factor factor = factors[v];
-            double value = factor.getValue(assignment);
-            result *= value;
-        }
-
-        return result;
+        return new FactorProduct(factors).computeAt(assignment);
     }
 
     public Graph getGraph() {

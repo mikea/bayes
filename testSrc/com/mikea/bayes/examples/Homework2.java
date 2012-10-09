@@ -15,10 +15,10 @@ import static org.junit.Assert.assertTrue;
 public class Homework2 {
     @Test
     public void testImap1() throws Exception {
-        Var a = Var.newVar("A", 2);
-        Var b = Var.newVar("B", 2);
-        Var c = Var.newVar("C", 2);
-        Var d = Var.newVar("D", 2);
+        Var a = new Var("A", 2);
+        Var b = new Var("B", 2);
+        Var c = new Var("C", 2);
+        Var d = new Var("D", 2);
 
         BayesianNetwork g = BayesianNetwork
                 .withVariables(a, b, c, d)
@@ -39,11 +39,11 @@ public class Homework2 {
 
     @Test
     public void testImap() throws Exception {
-        Var a = Var.newVar("A", 2);
-        Var b = Var.newVar("B", 2);
-        Var c = Var.newVar("C", 2);
-        Var d = Var.newVar("D", 2);
-        Var e = Var.newVar("E", 2);
+        Var a = new Var("A", 2);
+        Var b = new Var("B", 2);
+        Var c = new Var("C", 2);
+        Var d = new Var("D", 2);
+        Var e = new Var("E", 2);
 
         BayesianNetwork g = BayesianNetwork
                 .withVariables(a, b, c, d, e)
@@ -114,11 +114,11 @@ public class Homework2 {
 
     @Test
     public void testIEquivalent() throws Exception {
-        Var a = Var.newVar("A", 2);
-        Var b = Var.newVar("B", 2);
-        Var c = Var.newVar("C", 2);
-        Var d = Var.newVar("D", 2);
-        Var e = Var.newVar("E", 2);
+        Var a = new Var("A", 2);
+        Var b = new Var("B", 2);
+        Var c = new Var("C", 2);
+        Var d = new Var("D", 2);
+        Var e = new Var("E", 2);
 
         BayesianNetwork g = BayesianNetwork
                 .withVariables(a, b, c, d, e)
