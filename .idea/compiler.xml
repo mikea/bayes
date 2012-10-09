@@ -22,6 +22,7 @@
       <profile default="false" name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <processorPath useClasspath="true" />
+        <module name="bayes" />
         <module name="gga" />
       </profile>
     </annotationProcessing>
