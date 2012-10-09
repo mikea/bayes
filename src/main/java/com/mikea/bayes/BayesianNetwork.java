@@ -5,6 +5,7 @@ import org.gga.graph.Edge;
 import org.gga.graph.Graph;
 import org.gga.graph.impl.DataGraphImpl;
 import org.gga.graph.search.dfs.AbstractDfsVisitor;
+import org.gga.graph.sort.TopologicalSort;
 import org.gga.graph.util.Pair;
 
 import javax.annotation.Nonnull;
@@ -159,10 +160,17 @@ public class BayesianNetwork {
     }
 
     public Factor query(Var queryVar) {
-        VarSet allVars = newVarSet(getVars());
-        VarSet otherVars = allVars.removeVars(queryVar);
+        List<Var> vars = newArrayList();
+        int[] order = TopologicalSort.sort(graph.getIntGraph());
 
-        return computeJointDistribution().marginalize(otherVars).normalize();
+        for (int i = 0; i < graph.V(); i++) {
+            Var var = graph.getNode(order[i]);
+            if (var != queryVar) {
+                vars.add(var);
+            }
+        }
+
+        return Factor.sumProductVariableElimination(vars, newArrayList(factors)).normalize();
     }
 
     public static class Builder {

@@ -30,9 +30,9 @@ public class VarSetTest {
     public void testHasVariable() throws Exception {
         VarSet v = newVarSet(var2, var1);
 
-        assertTrue(v.hasVariable(var1));
-        assertTrue(v.hasVariable(var2));
-        assertTrue(!v.hasVariable(var3));
+        assertTrue(v.contains(var1));
+        assertTrue(v.contains(var2));
+        assertTrue(!v.contains(var3));
     }
 
     @Test

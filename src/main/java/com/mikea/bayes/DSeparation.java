@@ -125,17 +125,17 @@ public class DSeparation {
 
         for (int i = 0; i < network.getGraph().V(); ++i) {
             Var v1 = network.getVar(i);
-            if (observation.hasVariable(v1)) {
+            if (observation.contains(v1)) {
                 continue;
             }
             VarSet dSeparation = findDSeparation(network, v1, observation);
 
             for (int j = i + 1; j < network.getGraph().V(); j++) {
                 Var v2 = network.getVar(j);
-                if (observation.hasVariable(v2)) {
+                if (observation.contains(v2)) {
                     continue;
                 }
-                if (dSeparation.hasVariable(v2)) {
+                if (dSeparation.contains(v2)) {
                     result.add(of(v1, v2));
                 }
             }

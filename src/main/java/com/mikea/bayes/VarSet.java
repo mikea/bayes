@@ -59,7 +59,7 @@ public class VarSet implements Iterable<Var> {
 
 
 
-    public boolean hasVariable(Var var) {
+    public boolean contains(Var var) {
         return set.contains(var);
     }
 

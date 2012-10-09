@@ -7,9 +7,11 @@ import com.google.common.collect.Iterables;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mikea.bayes.VarSet.newVarSet;
 
@@ -41,7 +43,11 @@ public class Factor {
         return product(Arrays.asList(factors));
     }
 
-    // todo: this should be part of FactorProduct?
+    public static Factor product(List<Factor> factors) {
+        if (factors.size() == 1) return factors.get(0);
+        return product((Iterable<Factor>)factors);
+    }
+        // todo: this should be part of FactorProduct?
     public static Factor product(Iterable<Factor> factors) {
         Iterable<VarSet> varSets = Iterables.transform(factors, new Function<Factor, VarSet>() {
             @Override
@@ -224,6 +230,31 @@ public class Factor {
         }
 
         return new Factor(scope, newValues);
+    }
+
+    public static Factor sumProductVariableElimination(
+            List<Var> vars,
+            List<Factor> factors) {
+        for (Var var : vars) {
+            factors = sumProductEliminateVar(factors, var);
+        }
+
+        return product(factors);
+    }
+
+    private static List<Factor> sumProductEliminateVar(List<Factor> factors, Var var) {
+        List<Factor> result = newArrayList();
+        List<Factor> product = newArrayList();
+        for (Factor factor : factors) {
+            if (factor.getScope().contains(var)) {
+                product.add(factor);
+            } else {
+                result.add(factor);
+            }
+        }
+
+        result.add(product(product).marginalize(newVarSet(var)));
+        return result;
     }
 
     public static class Builder {
