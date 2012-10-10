@@ -11,7 +11,7 @@ import com.mikea.bayes.Var;
  * @author mike.aizatsky@gmail.com
  */
 public class NaiveInferenceBenchmark extends SimpleBenchmark {
-    @Param({"1", "10", "100"})
+    @Param({"1", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"})
     int size;
 
     private BayesianNetwork network;
@@ -46,6 +46,7 @@ public class NaiveInferenceBenchmark extends SimpleBenchmark {
         queryVar = vars[0];
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public void timeQuery(int reps) {
         for (int i = 0; i < reps; ++i) {
             network.query(queryVar);

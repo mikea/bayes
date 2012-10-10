@@ -42,6 +42,7 @@ public class Var {
     /**
      * Protect from override.
      */
+    @SuppressWarnings("EmptyMethod")
     @Override
     public final boolean equals(Object o) {
         return super.equals(o);

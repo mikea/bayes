@@ -32,54 +32,6 @@ public class BayesianNetwork {
         this.factors = factors;
     }
 
-    public static BayesianNetwork buildFromSamples(Graph graph, int[] nValues, int[][] samples) {
-        // TODO: implement
-        throw new UnsupportedOperationException();
-/*
-        int root = 0;
-        assert Trees.isTree(graph, root);
-        int[] parents = ParentRecorder.computeParents(graph, root);
-
-        double[][][] probabilities = new double[graph.V()][][];
-
-        for (int i = 0; i < graph.V(); ++i) {
-            if (i == root) continue;
-            int parent = parents[i];
-            assert parent >= 0;
-            probabilities[i] = new double[nValues[parent]][];
-            for (int j = 0; j < nValues[parent]; ++j) {
-                probabilities[i][j] = new double[nValues[i]];
-            }
-        }
-
-        for (int[] sample : samples) {
-            for (int i = 0; i < graph.V(); ++i) {
-                if (i == root) continue;
-                int parent = parents[i];
-
-                probabilities[i][sample[parent]][sample[i]] += 1;
-            }
-        }
-
-        // Normalize probabilities
-        for (int i = 0; i < graph.V(); ++i) {
-            if (i == root) continue;
-
-            for (int j = 0; j < probabilities[i].length; ++j) {
-                double sum = 0;
-                for (int k = 0; k < nValues[i]; ++k) {
-                    sum += probabilities[i][j][k];
-                }
-                for (int k = 0; k < nValues[i]; ++k) {
-                    probabilities[i][j][k] /= sum;
-                }
-            }
-        }
-
-        return new BayesianNetwork(graph, nValues, probabilities);
-*/
-    }
-
     public void validate() {
         // Validate factors
         checkState(factors.length == graph.V());
@@ -173,7 +125,7 @@ public class BayesianNetwork {
         int[] order = TopologicalSort.sort(graph.getIntGraph());
 
         for (int i = 0; i < graph.V(); i++) {
-            Var var = graph.getNode(order[i]);
+            Var var = getVar(order[i]);
             if (!query.contains(var)) {
                 vars.add(var);
             }

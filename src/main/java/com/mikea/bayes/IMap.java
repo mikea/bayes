@@ -20,7 +20,7 @@ import static com.mikea.bayes.VarSet.newVarSet;
 public class IMap {
     private final Set<Independence> independences;  // todo: independencies?
 
-    public IMap(Set<Independence> independences) {
+    private IMap(Set<Independence> independences) {
         this.independences = independences;
     }
 
