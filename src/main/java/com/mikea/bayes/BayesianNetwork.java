@@ -9,7 +9,11 @@ import org.gga.graph.sort.TopologicalSort;
 import org.gga.graph.util.Pair;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -137,6 +141,11 @@ public class BayesianNetwork {
         }
 
         return Factor.sumProductVariableElimination(vars, newArrayList(factors)).normalize();
+    }
+
+    @Nonnull
+    public Factor[] getFactors() {
+        return factors;
     }
 
     public static class Builder {

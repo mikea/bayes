@@ -3,6 +3,7 @@ package com.mikea.bayes;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
+import org.gga.graph.maps.DataGraph;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -11,9 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mikea.bayes.VarSet.newVarSet;
+import static org.gga.graph.impl.DataGraphImpl.newDataGraph;
 
 /**
  * @author mike.aizatsky@gmail.com
@@ -241,6 +245,47 @@ public class Factor {
         }
 
         return product(factors);
+    }
+
+    public static DataGraph<Var, List<Factor>> induceMarkovNetwork(Factor... factors) {
+        VarSet vars = VarSet.product(Iterables.transform(Arrays.asList(factors), new Function<Factor, VarSet>() {
+            @Nullable
+            @Override
+            public VarSet apply(@Nullable Factor input) {
+                return checkNotNull(input).getScope();
+            }
+        }));
+
+        DataGraph<Var, List<Factor>> graph = newDataGraph(vars.size(), false);
+
+        int i = 0;
+        for (Var var : vars) {
+            graph.setNode(i, var);
+            ++i;
+        }
+
+        for (int v = 0; v < graph.V(); ++v) {
+            Var vVar = checkNotNull(graph.getNode(v));
+            for (int w = v + 1; w < graph.V(); ++w) {
+                Var wVar = checkNotNull(graph.getNode(w));
+
+                List<Factor> edgeFactors = newArrayList();
+
+                for (Factor factor : factors) {
+                    VarSet scope = factor.getScope();
+                    if (scope.contains(vVar) && scope.contains(wVar)) {
+                        edgeFactors.add(factor);
+                    }
+                }
+
+                if (!edgeFactors.isEmpty()) {
+                    checkState(v != w);
+                    graph.insert(v, w, edgeFactors);
+                }
+            }
+        }
+
+        return graph;
     }
 
     private static List<Factor> sumProductEliminateVar(List<Factor> factors, Var var) {

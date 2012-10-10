@@ -163,4 +163,8 @@ public class VarSet implements Iterable<Var> {
         }
         return Arrays.asList(assignments);
     }
+
+    public int size() {
+        return vars.length;
+    }
 }

@@ -1,6 +1,9 @@
 package com.mikea.bayes;
 
+import org.gga.graph.maps.DataGraph;
 import org.junit.Test;
+
+import java.util.List;
 
 import static com.mikea.bayes.Factor.newFactor;
 import static com.mikea.bayes.Factor.product;
@@ -76,16 +79,31 @@ public class FactorTest {
     public void testObserveEvidence() throws Exception {
         Factor f1 = newFactor(vars(var1), new double[]{0.11, 0.89});
 
-        assertEquals("Factor({1(2)}, [0.11, 0.89])", f1.observeEvidence(vars(), new int[] {}).toString());
-        assertEquals("Factor({1(2)}, [0.11, 0.0])", f1.observeEvidence(vars(var1), new int[] {0}).toString());
-        assertEquals("Factor({1(2)}, [0.0, 0.89])", f1.observeEvidence(vars(var1), new int[] {1}).toString());
-        assertEquals("Factor({1(2)}, [0.11, 0.89])", f1.observeEvidence(vars(var2), new int[] {1}).toString());
+        assertEquals("Factor({1(2)}, [0.11, 0.89])", f1.observeEvidence(vars(), new int[]{}).toString());
+        assertEquals("Factor({1(2)}, [0.11, 0.0])", f1.observeEvidence(vars(var1), new int[]{0}).toString());
+        assertEquals("Factor({1(2)}, [0.0, 0.89])", f1.observeEvidence(vars(var1), new int[]{1}).toString());
+        assertEquals("Factor({1(2)}, [0.11, 0.89])", f1.observeEvidence(vars(var2), new int[]{1}).toString());
 
         Factor f2 = newFactor(vars(var2, var1), new double[]{0.59, 0.41, 0.22, 0.78});
-        assertEquals("Factor({2(2), 1(2)}, [0.59, 0.0, 0.22, 0.0])", f2.observeEvidence(vars(var2), new int[] {0}).toString());
-        assertEquals("Factor({2(2), 1(2)}, [0.0, 0.41, 0.0, 0.78])", f2.observeEvidence(vars(var2), new int[] {1}).toString());
-        assertEquals("Factor({2(2), 1(2)}, [0.59, 0.41, 0.0, 0.0])", f2.observeEvidence(vars(var1), new int[] {0}).toString());
-        assertEquals("Factor({2(2), 1(2)}, [0.0, 0.0, 0.22, 0.78])", f2.observeEvidence(vars(var1), new int[] {1}).toString());
-        assertEquals("Factor({2(2), 1(2)}, [0.0, 0.0, 0.22, 0.0])", f2.observeEvidence(vars(var1, var2), new int[] {1, 0}).toString());
+        assertEquals("Factor({2(2), 1(2)}, [0.59, 0.0, 0.22, 0.0])", f2.observeEvidence(vars(var2), new int[]{0}).toString());
+        assertEquals("Factor({2(2), 1(2)}, [0.0, 0.41, 0.0, 0.78])", f2.observeEvidence(vars(var2), new int[]{1}).toString());
+        assertEquals("Factor({2(2), 1(2)}, [0.59, 0.41, 0.0, 0.0])", f2.observeEvidence(vars(var1), new int[]{0}).toString());
+        assertEquals("Factor({2(2), 1(2)}, [0.0, 0.0, 0.22, 0.78])", f2.observeEvidence(vars(var1), new int[]{1}).toString());
+        assertEquals("Factor({2(2), 1(2)}, [0.0, 0.0, 0.22, 0.0])", f2.observeEvidence(vars(var1, var2), new int[]{1, 0}).toString());
+    }
+
+    @Test
+    public void testInducedMarkovNetwork() throws Exception {
+        Factor[] factors = BNFixture.buildStudentsNetwork().getFactors();
+        DataGraph<Var, List<Factor>> network = Factor.induceMarkovNetwork(factors);
+
+        assertEquals("DataGraphImpl{isDirected=false, [" +
+                "D<->G:[Factor({G(3), D(2), I(2)}, [0.3, 0.4, 0.3, 0.05, 0.25, 0.7, 0.9, 0.08, 0.02, 0.5, 0.3, 0.2])], " +
+                "D<->I:[Factor({G(3), D(2), I(2)}, [0.3, 0.4, 0.3, 0.05, 0.25, 0.7, 0.9, 0.08, 0.02, 0.5, 0.3, 0.2])], " +
+                "G<->I:[Factor({G(3), D(2), I(2)}, [0.3, 0.4, 0.3, 0.05, 0.25, 0.7, 0.9, 0.08, 0.02, 0.5, 0.3, 0.2])], " +
+                "G<->L:[Factor({L(2), G(3)}, [0.1, 0.9, 0.4, 0.6, 0.99, 0.01])], " +
+                "I<->S:[Factor({S(2), I(2)}, [0.95, 0.05, 0.2, 0.8])]]}",
+                network.toString());
+
     }
 }
