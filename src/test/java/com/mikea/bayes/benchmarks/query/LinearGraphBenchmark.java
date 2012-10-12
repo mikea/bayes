@@ -1,4 +1,4 @@
-package com.mikea.bayes.benchmarks;
+package com.mikea.bayes.benchmarks.query;
 
 import com.google.caliper.Param;
 import com.google.caliper.Runner;
@@ -10,7 +10,7 @@ import com.mikea.bayes.Var;
 /**
  * @author mike.aizatsky@gmail.com
  */
-public class NaiveInferenceBenchmark extends SimpleBenchmark {
+public class LinearGraphBenchmark extends SimpleBenchmark {
     @Param({"1", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"})
     int size;
 
@@ -54,6 +54,6 @@ public class NaiveInferenceBenchmark extends SimpleBenchmark {
     }
 
     public static void main(String[] args) {
-        Runner.main(NaiveInferenceBenchmark.class, args);
+        Runner.main(LinearGraphBenchmark.class, args);
     }
 }

@@ -42,6 +42,10 @@ public class Factor {
         return newFactor(newVarSet(vars), doubles);
     }
 
+    public static Factor newFactor(Iterable<Var> vars, double[] doubles) {
+        return newFactor(newVarSet(vars), doubles);
+    }
+
     public static Factor product(Factor...factors) {
         if (factors.length == 1) return factors[0];
         return product(Arrays.asList(factors));
@@ -100,20 +104,20 @@ public class Factor {
         return result.toString();
     }
 
-    public String toStringAsTable(Var rowsVar, String valueFormat) {
+    public String toStringAsTable(Var columnVar, String valueFormat) {
         StringBuilder result = new StringBuilder();
         result.append("Factor(");
         result.append(scope);
         result.append("):\n");
-        VarSet rowsVarSet = scope.removeVars(rowsVar);
+        VarSet rowsVarSet = scope.removeVars(columnVar);
 
         for (VarAssignment rowAssignment : rowsVarSet.assignments()) {
             result.append(rowAssignment.toString());
             result.append(": ");
 
-            for (int i = 0; i < rowsVar.getCardinality(); ++i) {
+            for (int i = 0; i < columnVar.getCardinality(); ++i) {
                 if (i > 0) result.append(" ");
-                VarAssignment assignment = rowAssignment.set(rowsVar, i);
+                VarAssignment assignment = rowAssignment.set(columnVar, i);
                 result.append(String.format(valueFormat, getValue(assignment)));
             }
             result.append("\n");
@@ -237,16 +241,6 @@ public class Factor {
         return new Factor(scope, newValues);
     }
 
-    public static Factor sumProductVariableElimination(
-            List<Var> vars,
-            List<Factor> factors) {
-        for (Var var : vars) {
-            factors = sumProductEliminateVar(factors, var);
-        }
-
-        return product(factors);
-    }
-
     public static DataGraph<Var, List<Factor>> induceMarkovNetwork(Factor... factors) {
         VarSet vars = VarSet.product(Iterables.transform(Arrays.asList(factors), new Function<Factor, VarSet>() {
             @Nullable
@@ -288,22 +282,6 @@ public class Factor {
         return graph;
     }
 
-    private static List<Factor> sumProductEliminateVar(List<Factor> factors, Var var) {
-        List<Factor> result = newArrayList();
-        List<Factor> product = newArrayList();
-        for (Factor factor : factors) {
-            VarSet scope = factor.getScope();
-            if (scope.contains(var)) {
-                product.add(factor);
-            } else {
-                result.add(factor);
-            }
-        }
-
-        result.add(product(product).marginalize(newVarSet(var)));
-        return result;
-    }
-
     public static class Builder {
         private VarSet varSet;
         private double[] values;
@@ -341,8 +319,7 @@ public class Factor {
 
         public Builder set(VarAssignment.Builder at, double value) {
             VarAssignment assignment = at.build();
-            int idx = varSet.getIndex(assignment);
-            this.values[idx] = value;
+            this.values[varSet.getIndex(assignment)] = value;
             return this;
         }
 
@@ -350,5 +327,20 @@ public class Factor {
             Arrays.fill(values, v);
             return this;
         }
+
+        public Builder row(Var var, VarAssignment.Builder at, String[] valueOrder, double[] doubles) {
+            VarAssignment assignment = at.build();
+
+            for (int i = 0; i < valueOrder.length; ++i) {
+                String value = valueOrder[i];
+                double d = doubles[i];
+
+                VarAssignment a = assignment.set(var, value);
+                this.values[varSet.getIndex(a)] = d;
+            }
+
+            return this;
+        }
     }
+
 }

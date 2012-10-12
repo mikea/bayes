@@ -25,7 +25,7 @@ public class IMap {
     }
 
     public static IMap computeIMap(BayesianNetwork network) {
-        Set<Var> vars = network.getVars();
+        Set<Var> vars = network.getVarSet();
 
         Set<Set<Var>> allPossibleObservations = Sets.powerSet(vars);
         Set<Independence> independences = newHashSet();

@@ -27,7 +27,7 @@ public class Homework1 {
 
         Factor fp = newFactor(vars(P), new double[]{0.99, 0.01});
         Factor fa = newFactor(vars(A), new double[]{0.9, 0.1});
-        Factor ft = newFactor(vars(A, P, T),
+        Factor ft = newFactor(vars(T, P, A),
                 new double[]{
                         // a0p0, a1p0, a0p1, a1p1
                            0.9,  0.5,  0.4,  0.1,  // t0

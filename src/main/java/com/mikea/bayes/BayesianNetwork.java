@@ -1,6 +1,8 @@
 package com.mikea.bayes;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import org.gga.graph.Edge;
 import org.gga.graph.Graph;
 import org.gga.graph.impl.DataGraphImpl;
@@ -13,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -20,6 +23,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.mikea.bayes.SumProduct.sumProductVariableElimination;
 import static com.mikea.bayes.VarSet.newVarSet;
 
 public class BayesianNetwork {
@@ -106,13 +110,22 @@ public class BayesianNetwork {
         return computeProbability(at.build());
     }
 
-    public Set<Var> getVars() {
+    public Set<Var> getVarSet() {
         Set<Var> vars = newHashSet();
         for (int i = 0; i < graph.V(); i++) {
             vars.add(graph.getNode(i));
         }
 
         return Collections.unmodifiableSet(vars);
+    }
+
+    public List<Var> getVarList() {
+        ImmutableList.Builder<Var> result = new ImmutableList.Builder<Var>();
+        for (int i = 0; i < graph.V(); i++) {
+            result = result.add(graph.getNode(i));
+        }
+
+        return result.build();
     }
 
     public Factor query(Var...queryVars) {
@@ -140,12 +153,37 @@ public class BayesianNetwork {
             factors.add(factor.observeEvidence(observedVariables, observedValues));
         }
 
-        return Factor.sumProductVariableElimination(vars, newArrayList(factors)).normalize();
+        return sumProductVariableElimination(vars, newArrayList(factors)).normalize();
     }
 
     @Nonnull
     public Factor[] getFactors() {
         return factors;
+    }
+
+    public static Builder withVariables(Iterable<Var> vars) {
+        return withVariables(Iterables.toArray(vars, Var.class));
+    }
+
+    public Var getVarByName(String varName) {
+        for (int i = 0; i < graph.V(); ++i) {
+            if (getVar(i).getName().equals(varName)) return getVar(i);
+        }
+
+        throw new NoSuchElementException();
+    }
+
+    public Factor getFactor(Var v) {
+        return factors[getVarIndex(v)];
+    }
+
+    public Factor query(Var[] queryVars, Var[] vars, String[] values) {
+        int[] intValues = new int[values.length];
+        for (int i = 0; i < values.length; i++) {
+            intValues[i] = vars[i].getValueIndex(values[i]);
+        }
+
+        return query(newVarSet(queryVars), vars, intValues);
     }
 
     public static class Builder {

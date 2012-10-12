@@ -85,8 +85,7 @@ public class VarSet implements Iterable<Var> {
         Preconditions.checkArgument(assignment.containsAll(this.vars),
                 "Assignment %s do not match this %s", assignment, this);
 
-        for (int i = vars.length - 1; i >= 0; --i) {
-            Var var = vars[i];
+        for (Var var : vars) {
             int cardinality = var.getCardinality();
             int val = assignment.get(var);
             Preconditions.checkArgument(val >= 0, "Bad assignment %s@%s for set %s (full assignment: %s)", val, var, this, assignment);
@@ -101,7 +100,7 @@ public class VarSet implements Iterable<Var> {
         int[] values = new int[vars.length];
         Arrays.fill(values, -1);
 
-        for (int i = 0; i < vars.length; i++) {
+        for (int i = vars.length - 1; i >= 0; --i) {
             Var var = vars[i];
             int cardinality = var.getCardinality();
             int varValue = idx % cardinality;
@@ -127,6 +126,10 @@ public class VarSet implements Iterable<Var> {
 
     public static VarSet newVarSet(Var...vars) {
         return new VarSet(vars);
+    }
+
+    public static VarSet newVarSet(Iterable<Var> vars) {
+        return new VarSet(Iterables.toArray(vars, Var.class));
     }
 
     public static VarSet newVarSet(Set<Var> vars) {

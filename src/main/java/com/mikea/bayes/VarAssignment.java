@@ -43,7 +43,7 @@ public class VarAssignment implements Iterable<Var> {
             Var var = vars[i];
             result.append(var.getName());
             result.append("=");
-            result.append(values[i]);
+            result.append(var.getValue(values[i]));
         }
 
         result.append("}");
@@ -61,6 +61,10 @@ public class VarAssignment implements Iterable<Var> {
     }
 
     public static Builder at(Var var, int value) {
+        return new Builder().at(var, value);
+    }
+
+    public static Builder at(Var var, String value) {
         return new Builder().at(var, value);
     }
 
@@ -88,6 +92,10 @@ public class VarAssignment implements Iterable<Var> {
         return new VarAssignment(newVars, newValues);
     }
 
+    public VarAssignment set(Var var, String value) {
+        return set(var, var.getValueIndex(value));
+    }
+
     public static class Builder {
         private final List<Var> vars = newArrayList();
         private final List<Integer> values = newArrayList();
@@ -105,6 +113,11 @@ public class VarAssignment implements Iterable<Var> {
             values.add(value);
             return this;
         }
+
+        public Builder at(Var var, String value) {
+            return at(var, var.getValueIndex(value));
+        }
+
 
         public VarAssignment build() {
             Var[] v = new Var[vars.size()];

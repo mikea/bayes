@@ -6,6 +6,7 @@ import com.mikea.bayes.VarAssignment;
 import org.junit.Test;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.mikea.bayes.Utils.strings;
 import static com.mikea.bayes.VarAssignment.at;
 import static org.junit.Assert.assertEquals;
 
@@ -18,14 +19,25 @@ import static org.junit.Assert.assertEquals;
 public class ProgrammingAssignment2 {
     @Test
     public void testPhenotypeGivenGenotypeMendelianFactor() throws Exception {
-        Var genotype = new Var("genotype", 3);
-        Var phenotype = new Var("phenotype", 2);
+        // 0 - FF
+        // 1 - Ff
+        // 2 - ff
+        Var genotype = new Var("genotype", 3, strings("FF", "Ff", "ff"));
+        Var phenotype = new Var("phenotype", 2, strings("F", "T"));
 
-        assertEquals("Factor({phenotype(2), genotype(3)}, [0.0, 1.0, 0.0, 1.0, 1.0, 0.0])",
-                getPhenotypeGivenGenotypeMendelianFactor(true, genotype, phenotype).toString());
+        assertEquals(
+                "Factor({phenotype(2, [F, T]), genotype(3, [FF, Ff, ff])}):\n" +
+                        "{genotype=FF}: 0.0 1.0\n" +
+                        "{genotype=Ff}: 0.0 1.0\n" +
+                        "{genotype=ff}: 1.0 0.0\n",
+                getPhenotypeGivenGenotypeMendelianFactor(true, genotype, phenotype).toStringAsTable(phenotype, "%.1f"));
 
-        assertEquals("Factor({phenotype(2), genotype(3)}, [1.0, 0.0, 1.0, 0.0, 0.0, 1.0])",
-                getPhenotypeGivenGenotypeMendelianFactor(false, genotype, phenotype).toString());
+        assertEquals(
+                "Factor({phenotype(2, [F, T]), genotype(3, [FF, Ff, ff])}):\n" +
+                        "{genotype=FF}: 1.0 0.0\n" +
+                        "{genotype=Ff}: 1.0 0.0\n" +
+                        "{genotype=ff}: 0.0 1.0\n",
+                getPhenotypeGivenGenotypeMendelianFactor(false, genotype, phenotype).toStringAsTable(phenotype, "%.1f"));
     }
 
     @Test
@@ -33,8 +45,11 @@ public class ProgrammingAssignment2 {
         Var genotype = new Var("genotype", 3);
         Var phenotype = new Var("phenotype", 2);
 
-        assertEquals("Factor({phenotype(2), genotype(3)}, [0.19999999999999996, 0.8, 0.4, 0.6, 0.9, 0.1])",
-                getPhenotypeGivenGenotypeFactor(genotype, phenotype, new double[] {0.8, 0.6, 0.1}).toString());
+        assertEquals("Factor({phenotype(2), genotype(3)}):\n" +
+                "{genotype=0}: 0.2 0.8\n" +
+                "{genotype=1}: 0.4 0.6\n" +
+                "{genotype=2}: 0.9 0.1\n",
+                getPhenotypeGivenGenotypeFactor(genotype, phenotype, new double[] {0.8, 0.6, 0.1}).toStringAsTable(phenotype, "%.1f"));
     }
 
     @Test
@@ -52,15 +67,15 @@ public class ProgrammingAssignment2 {
 
         assertEquals(
                 "Factor({c(3), p1(3), p2(3)}):\n" +
-                "{p1=0, p2=0}: 1.00 0.00 0.00\n" +
-                "{p1=1, p2=0}: 0.50 0.50 0.00\n" +
-                "{p1=2, p2=0}: 0.00 1.00 0.00\n" +
-                "{p1=0, p2=1}: 0.50 0.50 0.00\n" +
-                "{p1=1, p2=1}: 0.25 0.50 0.25\n" +
-                "{p1=2, p2=1}: 0.00 0.50 0.50\n" +
-                "{p1=0, p2=2}: 0.00 1.00 0.00\n" +
-                "{p1=1, p2=2}: 0.00 0.50 0.50\n" +
-                "{p1=2, p2=2}: 0.00 0.00 1.00\n",
+                        "{p1=0, p2=0}: 1.00 0.00 0.00\n" +
+                        "{p1=0, p2=1}: 0.50 0.50 0.00\n" +
+                        "{p1=0, p2=2}: 0.00 1.00 0.00\n" +
+                        "{p1=1, p2=0}: 0.50 0.50 0.00\n" +
+                        "{p1=1, p2=1}: 0.25 0.50 0.25\n" +
+                        "{p1=1, p2=2}: 0.00 0.50 0.50\n" +
+                        "{p1=2, p2=0}: 0.00 1.00 0.00\n" +
+                        "{p1=2, p2=1}: 0.00 0.50 0.50\n" +
+                        "{p1=2, p2=2}: 0.00 0.00 1.00\n",
                 getGenotypeGivenParentsGenotypesFactor(genotypeChild, genotypeParent1, genotypeParent2, 2).toStringAsTable(genotypeChild, "%1.2f"));
     }
 
@@ -215,25 +230,21 @@ public class ProgrammingAssignment2 {
         checkArgument(genotype.getCardinality() == 3);
         checkArgument(phenotype.getCardinality() == 2);
 
-        // 0 = AA
-        // 1 = Aa
-        // 2 = aa
         if (isDominant) {
             return Factor
                     .withVariables(phenotype, genotype)
-                    .row(phenotype, at(genotype, 0), new double[]{0, 1})
-                    .row(phenotype, at(genotype, 1), new double[]{0, 1})
-                    .row(phenotype, at(genotype, 2), new double[]{1, 0})
+                    .row(phenotype, at(genotype, "FF"), strings("T", "F"), new double[]{1, 0})
+                    .row(phenotype, at(genotype, "Ff"), strings("T", "F"), new double[]{1, 0})
+                    .row(phenotype, at(genotype, "ff"), strings("T", "F"), new double[]{0, 1})
                     .build();
         } else {
             return Factor
                     .withVariables(phenotype, genotype)
-                    .row(phenotype, at(genotype, 0), new double[]{1, 0})
-                    .row(phenotype, at(genotype, 1), new double[]{1, 0})
-                    .row(phenotype, at(genotype, 2), new double[]{0, 1})
+                    .row(phenotype, at(genotype, "FF"), strings("T", "F"), new double[]{0, 1})
+                    .row(phenotype, at(genotype, "Ff"), strings("T", "F"), new double[]{0, 1})
+                    .row(phenotype, at(genotype, "ff"), strings("T", "F"), new double[]{1, 0})
                     .build();
         }
     }
-
 
 }

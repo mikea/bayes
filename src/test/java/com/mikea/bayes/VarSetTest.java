@@ -14,6 +14,7 @@ public class VarSetTest {
     private static final Var var1 = new Var("1", 2);
     private static final Var var2 = new Var("2", 2);
     private static final Var var3 = new Var("3", 3);
+    private static final Var var4 = new Var("4", 4);
 
     @Test
     public void testToString() throws Exception {
@@ -48,21 +49,6 @@ public class VarSetTest {
     }
 
     @Test
-    public void testGetAssignment() throws Exception {
-        VarSet v = newVarSet(var1);
-        assertEquals("{1=0}", v.getAssignment(0).toString());
-        assertEquals("{1=1}", v.getAssignment(1).toString());
-
-        v = newVarSet(var1, var3);
-        assertEquals("{1=0, 3=0}", v.getAssignment(0).toString());
-        assertEquals("{1=1, 3=0}", v.getAssignment(1).toString());
-        assertEquals("{1=0, 3=1}", v.getAssignment(2).toString());
-        assertEquals("{1=1, 3=1}", v.getAssignment(3).toString());
-        assertEquals("{1=0, 3=2}", v.getAssignment(4).toString());
-        assertEquals("{1=1, 3=2}", v.getAssignment(5).toString());
-    }
-
-    @Test
     public void testGetIndex() throws Exception {
         VarSet v = newVarSet(var1);
         verifyGetIndex(v);
@@ -78,6 +64,60 @@ public class VarSetTest {
         for (int i = 0; i < v.getMaxIndex(); ++i) {
             assertEquals(i, v.getIndex(v.getAssignment(i)));
         }
+    }
+
+    @Test
+    public void testAssignmentOrder() throws Exception {
+
+        assertEquals(
+                "{1=0}\n" +
+                "{1=1}", getAssignmentOrder(newVarSet(var1)));
+
+        assertEquals(
+                "{2=0, 3=0}\n" +
+                "{2=0, 3=1}\n" +
+                "{2=0, 3=2}\n" +
+                "{2=1, 3=0}\n" +
+                "{2=1, 3=1}\n" +
+                "{2=1, 3=2}",
+                getAssignmentOrder(newVarSet(var2, var3)));
+
+        assertEquals(
+                "{2=0, 3=0, 4=0}\n" +
+                "{2=0, 3=0, 4=1}\n" +
+                "{2=0, 3=0, 4=2}\n" +
+                "{2=0, 3=0, 4=3}\n" +
+                "{2=0, 3=1, 4=0}\n" +
+                "{2=0, 3=1, 4=1}\n" +
+                "{2=0, 3=1, 4=2}\n" +
+                "{2=0, 3=1, 4=3}\n" +
+                "{2=0, 3=2, 4=0}\n" +
+                "{2=0, 3=2, 4=1}\n" +
+                "{2=0, 3=2, 4=2}\n" +
+                "{2=0, 3=2, 4=3}\n" +
+                "{2=1, 3=0, 4=0}\n" +
+                "{2=1, 3=0, 4=1}\n" +
+                "{2=1, 3=0, 4=2}\n" +
+                "{2=1, 3=0, 4=3}\n" +
+                "{2=1, 3=1, 4=0}\n" +
+                "{2=1, 3=1, 4=1}\n" +
+                "{2=1, 3=1, 4=2}\n" +
+                "{2=1, 3=1, 4=3}\n" +
+                "{2=1, 3=2, 4=0}\n" +
+                "{2=1, 3=2, 4=1}\n" +
+                "{2=1, 3=2, 4=2}\n" +
+                "{2=1, 3=2, 4=3}",
+                getAssignmentOrder(newVarSet(var2, var3, var4)));
+    }
+
+    private String getAssignmentOrder(VarSet v) {
+        StringBuilder order = new StringBuilder();
+        for (int i = 0; i < v.getMaxIndex(); ++i) {
+            if (i > 0) order.append("\n");
+            order.append(v.getAssignment(i).toString());
+        }
+
+        return order.toString();
     }
 
     @Test

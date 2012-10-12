@@ -18,9 +18,12 @@ public class BNFixture {
     public static BayesianNetwork buildStudentsNetwork() {
         Factor factorD = newFactor(vars(D), new double[]{0.6, 0.4});
         Factor factorI = newFactor(vars(I), new double[]{0.7, 0.3});
-        Factor factorG = newFactor(vars(G, D, I), new double[]{0.3, 0.4, 0.3, 0.05, 0.25, 0.7, 0.9, 0.08, 0.02, 0.5, 0.3, 0.2});
-        Factor factorS = newFactor(vars(S, I), new double[]{0.95, 0.05, 0.2, 0.8});
-        Factor factorL = newFactor(vars(L, G), new double[]{0.1, 0.9, 0.4, 0.6, 0.99, 0.01});
+        Factor factorG = newFactor(vars(G, I, D), new double[]{
+                0.3, 0.05, 0.9, 0.5, 0.4, 0.25, 0.08, 0.3, 0.3, 0.7, 0.02, 0.2});
+        Factor factorS = newFactor(vars(S, I), new double[]{
+                0.95, 0.2, 0.05, 0.8});
+        Factor factorL = newFactor(vars(L, G), new double[]{
+                0.1, 0.4, 0.99, 0.9, 0.6, 0.01});
 
         // check some factor values
         assertEquals(0.3,
