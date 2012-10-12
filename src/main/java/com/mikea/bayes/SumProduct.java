@@ -5,12 +5,10 @@ import com.google.common.collect.Multimap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.mikea.bayes.VarSet.newVarSet;
 
@@ -18,9 +16,8 @@ import static com.mikea.bayes.VarSet.newVarSet;
  * @author mike.aizatsky@gmail.com
  */
 public class SumProduct {
-    // todo: allow supplying order strategy. Implement min-neighbors, min-weight, min-fill, weighted-min-fill
     public static Factor sumProductVariableElimination(
-            List<Var> vars,
+            Iterable<Var> vars,
             List<Factor> factors) {
         return sumProductVariableElimination(vars, factors, new MinNeighborsStrategy());
     }
@@ -55,28 +52,9 @@ public class SumProduct {
         return result;
     }
 
+    // todo: allow supplying order strategy. Implement min-neighbors, min-weight, min-fill, weighted-min-fill
     public static interface VarOrderStrategy {
         Var pickVar(Set<Var> vars, List<Factor> factors);
-    }
-
-    public static class FixedOrderStrategy implements VarOrderStrategy {
-        private final List<Var> varOrder;
-
-        public FixedOrderStrategy(List<Var> varOrder) {
-            this.varOrder = newLinkedList(varOrder);
-        }
-
-        @Override
-        public Var pickVar(Set<Var> vars, List<Factor> factors) {
-            for (Iterator<Var> i = varOrder.iterator(); i.hasNext();) {
-                Var var = i.next();
-                if (vars.contains(var)) {
-                    i.remove();
-                    return var;
-                }
-            }
-            throw new IllegalStateException();
-        }
     }
 
     public static abstract class GreedyOrderStrategy implements VarOrderStrategy {
@@ -124,6 +102,29 @@ public class SumProduct {
 
             for (Var var : neighbors.keySet()) {
                 costMap.put(var, neighbors.get(var).size());
+            }
+        }
+    }
+
+    public static class MinWeightStrategy extends GreedyOrderStrategy {
+        @Override
+        public void computeCosts(TObjectIntMap<Var> costMap, List<Factor> factors) {
+            Multimap<Var, Var> neighbors = HashMultimap.create();
+
+            for (Factor factor : factors) {
+                VarSet scope = factor.getScope();
+
+                for (Var var : scope) {
+                    neighbors.putAll(var, scope);
+                }
+            }
+
+            for (Var var : neighbors.keySet()) {
+                int card = 1;
+                for (Var v : neighbors.get(var)) {
+                    card *= v.getCardinality();
+                }
+                costMap.put(var, card);
             }
         }
     }

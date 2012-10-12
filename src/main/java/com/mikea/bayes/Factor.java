@@ -3,6 +3,8 @@ package com.mikea.bayes;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Doubles;
 import org.gga.graph.maps.DataGraph;
 
 import javax.annotation.Nullable;
@@ -87,6 +89,17 @@ public class Factor {
     @Override
     public String toString() {
         return "Factor(" + scope + ", " + Arrays.toString(values) + ")";
+    }
+
+    public String toString(final String valueFormat) {
+        return "Factor(" + scope + ", " +
+                Lists.transform(Doubles.asList(values), new Function<Double, Object>() {
+                    @Override
+                    public String apply(@Nullable Double input) {
+                        return String.format(valueFormat, input);
+                    }
+                }) +
+                ")";
     }
 
     public String toStringAsTable(String valueFormat) {

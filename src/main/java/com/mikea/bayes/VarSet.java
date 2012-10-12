@@ -170,4 +170,8 @@ public class VarSet implements Iterable<Var> {
     public int size() {
         return vars.length;
     }
+
+    public Set<Var> getVarSet() {
+        return set;
+    }
 }

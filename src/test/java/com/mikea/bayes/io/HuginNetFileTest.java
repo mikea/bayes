@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class HuginNetFileTest {
     @Test
-    public void testLoad() throws Exception {
+    public void testCysticFibrosisBayesNet() throws Exception {
         BayesianNetwork network = HuginNetFile.loadNetFile(new FileInputStream("./testData/cysticFibrosisBayesNet.net"));
         assertEquals("[" +
                 "IraGenotype(3, [FF, Ff, ff]), " +
@@ -71,5 +71,10 @@ public class HuginNetFileTest {
                         "{ReneGenotype=ff, JamesGenotype=ff, JasonGenotype=Ff}: 0.000000\n" +
                         "{ReneGenotype=ff, JamesGenotype=ff, JasonGenotype=ff}: 1.000000\n",
                 jasonGenotypeFactor.toStringAsTable("%f"));
+    }
+
+    @Test
+    public void testCysticFibrosisBayesNetGeneCopy() throws Exception {
+        HuginNetFile.loadNetFile(new FileInputStream("./testData/cysticFibrosisBayesNetGeneCopy.net"));
     }
 }

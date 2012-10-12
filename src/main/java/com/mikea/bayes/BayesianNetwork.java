@@ -3,11 +3,11 @@ package com.mikea.bayes;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.mikea.bayes.query.QueryAlgorithm;
 import org.gga.graph.Edge;
 import org.gga.graph.Graph;
 import org.gga.graph.impl.DataGraphImpl;
 import org.gga.graph.search.dfs.AbstractDfsVisitor;
-import org.gga.graph.sort.TopologicalSort;
 import org.gga.graph.util.Pair;
 
 import javax.annotation.Nonnull;
@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
-import static com.mikea.bayes.SumProduct.sumProductVariableElimination;
 import static com.mikea.bayes.VarSet.newVarSet;
 
 public class BayesianNetwork {
@@ -128,32 +127,33 @@ public class BayesianNetwork {
         return result.build();
     }
 
+    public Factor query(QueryAlgorithm algo, Var[] queryVars, Var[] vars, String[] values) {
+        int[] intValues = new int[values.length];
+        for (int i = 0; i < values.length; i++) {
+            intValues[i] = vars[i].getValueIndex(values[i]);
+        }
+
+        return query(algo, newVarSet(queryVars), vars, intValues);
+    }
+
+    public Factor query(QueryAlgorithm queryAlgorithm, Var...queryVars) {
+        return query(queryAlgorithm, newVarSet(queryVars));
+    }
+
     public Factor query(Var...queryVars) {
-        return query(newVarSet(queryVars));
+        return query(QueryAlgorithm.DEFAULT, newVarSet(queryVars));
     }
 
-    public Factor query(VarSet query) {
-        return query(query, new Var[]{}, new int[]{});
+    public Factor query(QueryAlgorithm queryAlgorithm, VarSet query) {
+        return query(queryAlgorithm, query, new Var[]{}, new int[]{});
     }
 
+    public Factor query(QueryAlgorithm queryAlgorithm, VarSet query, Var[] observedVariables, int[] observedValues) {
+        return queryAlgorithm.query(this, query, observedVariables, observedValues);
+
+    }
     public Factor query(VarSet query, Var[] observedVariables, int[] observedValues) {
-        List<Var> vars = newArrayList();
-
-        int[] order = TopologicalSort.sort(graph.getIntGraph());
-
-        for (int i = 0; i < graph.V(); i++) {
-            Var var = getVar(order[i]);
-            if (!query.contains(var)) {
-                vars.add(var);
-            }
-        }
-
-        List<Factor> factors = newArrayList();
-        for (Factor factor : this.factors) {
-            factors.add(factor.observeEvidence(observedVariables, observedValues));
-        }
-
-        return sumProductVariableElimination(vars, newArrayList(factors)).normalize();
+        return query(QueryAlgorithm.DEFAULT, query, observedVariables, observedValues);
     }
 
     @Nonnull
@@ -175,15 +175,6 @@ public class BayesianNetwork {
 
     public Factor getFactor(Var v) {
         return factors[getVarIndex(v)];
-    }
-
-    public Factor query(Var[] queryVars, Var[] vars, String[] values) {
-        int[] intValues = new int[values.length];
-        for (int i = 0; i < values.length; i++) {
-            intValues[i] = vars[i].getValueIndex(values[i]);
-        }
-
-        return query(newVarSet(queryVars), vars, intValues);
     }
 
     public static class Builder {
