@@ -56,11 +56,11 @@ public class SumProduct {
         return result;
     }
 
-    // todo: allow supplying order strategy. Implement min-neighbors, min-weight, min-fill, weighted-min-fill
     public static interface VarOrderStrategy {
         Var pickVar(ProbabilitySpace space, Set<Var> vars, List<Factor> factors);
     }
 
+    // todo: add min-fill & weighted-min-fill strategies.
     public static abstract class GreedyOrderStrategy implements VarOrderStrategy {
         public abstract void computeCosts(int[] costs, Set<Var> vars, List<Factor> factors);
 
