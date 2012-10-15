@@ -77,4 +77,9 @@ public class HuginNetFileTest {
     public void testCysticFibrosisBayesNetGeneCopy() throws Exception {
         HuginNetFile.loadNetFile(new FileInputStream("./testData/cysticFibrosisBayesNetGeneCopy.net"));
     }
+
+    @Test
+    public void testSpinalMuscularAtrophyBayesNet() throws Exception {
+        HuginNetFile.loadNetFile(new FileInputStream("./testData/spinalMuscularAtrophyBayesNet.net"));
+    }
 }
