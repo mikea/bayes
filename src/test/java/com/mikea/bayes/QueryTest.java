@@ -37,10 +37,12 @@ public class QueryTest {
 
     @Test
     public void testQueryLinear() throws Exception {
+        ProbabilitySpace space = new ProbabilitySpace();
+
         int size = 10;
         Var[] vars = new Var[size];
         for (int i = 0; i < size; ++i) {
-            vars[i] = new Var(String.valueOf(i), 2);
+            vars[i] = space.newVar(String.valueOf(i), 2);
         }
 
         BayesianNetwork.Builder networkBuilder = BayesianNetwork.withVariables(vars);

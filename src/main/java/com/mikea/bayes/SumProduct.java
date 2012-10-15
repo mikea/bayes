@@ -2,12 +2,12 @@ package com.mikea.bayes;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.mikea.bayes.VarSet.newVarSet;
@@ -26,9 +26,13 @@ public class SumProduct {
             Iterable<Var> vars,
             List<Factor> factors,
             VarOrderStrategy strategy) {
+        return sumProductVariableElimination(ProbabilitySpace.get(vars), vars, factors, strategy);
+    }
+
+    private static Factor sumProductVariableElimination(ProbabilitySpace space, Iterable<Var> vars, List<Factor> factors, VarOrderStrategy strategy) {
         Set<Var> varSet = newHashSet(vars);
         while (!varSet.isEmpty()) {
-            Var var = strategy.pickVar(varSet, factors);
+            Var var = strategy.pickVar(space, varSet, factors);
             factors = sumProductEliminateVar(factors, var);
             varSet.remove(var);
         }
@@ -54,42 +58,38 @@ public class SumProduct {
 
     // todo: allow supplying order strategy. Implement min-neighbors, min-weight, min-fill, weighted-min-fill
     public static interface VarOrderStrategy {
-        Var pickVar(Set<Var> vars, List<Factor> factors);
+        Var pickVar(ProbabilitySpace space, Set<Var> vars, List<Factor> factors);
     }
 
     public static abstract class GreedyOrderStrategy implements VarOrderStrategy {
-        public abstract void computeCosts(TObjectIntMap<Var> costMap, List<Factor> factors);
+        public abstract void computeCosts(int[] costs, Set<Var> vars, List<Factor> factors);
 
         @Override
-        public Var pickVar(Set<Var> vars, List<Factor> factors) {
-            Var[] varArray = vars.toArray(new Var[vars.size()]);
-            TObjectIntHashMap<Var> costs = new TObjectIntHashMap<Var>();
+        public Var pickVar(ProbabilitySpace space, Set<Var> vars, List<Factor> factors) {
+            int[] costs = new int[space.getNumVars()];
+            Arrays.fill(costs, 1);
 
-            for (Var var : varArray) {
-                costs.put(var, 1);
-            }
-            computeCosts(costs, factors);
+            computeCosts(costs, vars, factors);
 
 
-            Var minVar = varArray[0];
-            int minCost = costs.get(minVar);
+            Var minVar = null;
+            int minCost = Integer.MAX_VALUE;
 
-            for (int i = 1; i < varArray.length; i++) {
-                Var var = varArray[i];
-                int cost = costs.get(var);
+            for (Var var : vars) {
+                int cost = costs[var.getIndex()];
                 if (cost < minCost) {
-                    minVar = var;
                     minCost = cost;
+                    minVar = var;
                 }
             }
 
-            return minVar;
+            return checkNotNull(minVar);
         }
     }
 
     public static class MinNeighborsStrategy extends GreedyOrderStrategy {
         @Override
-        public void computeCosts(TObjectIntMap<Var> costMap, List<Factor> factors) {
+        public void computeCosts(int[] costs, Set<Var> vars, List<Factor> factors) {
             Multimap<Var, Var> neighbors = HashMultimap.create();
 
             for (Factor factor : factors) {
@@ -101,30 +101,21 @@ public class SumProduct {
             }
 
             for (Var var : neighbors.keySet()) {
-                costMap.put(var, neighbors.get(var).size());
+                costs[var.getIndex()] = neighbors.get(var).size();
             }
         }
     }
 
     public static class MinWeightStrategy extends GreedyOrderStrategy {
         @Override
-        public void computeCosts(TObjectIntMap<Var> costMap, List<Factor> factors) {
-            Multimap<Var, Var> neighbors = HashMultimap.create();
-
+        public void computeCosts(int[] costs, Set<Var> vars, List<Factor> factors) {
             for (Factor factor : factors) {
                 VarSet scope = factor.getScope();
+                int factorCardinality = scope.getCardinality();
 
                 for (Var var : scope) {
-                    neighbors.putAll(var, scope);
+                    costs[var.getIndex()] *= factorCardinality;
                 }
-            }
-
-            for (Var var : neighbors.keySet()) {
-                int card = 1;
-                for (Var v : neighbors.get(var)) {
-                    card *= v.getCardinality();
-                }
-                costMap.put(var, card);
             }
         }
     }

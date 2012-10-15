@@ -63,7 +63,7 @@ public class VarSet implements Iterable<Var> {
         return set.contains(var);
     }
 
-    public int getMaxIndex() {
+    public int getCardinality() {
         int result = 1;
         for (Var var : this) {
             result *= var.getCardinality();
@@ -96,7 +96,7 @@ public class VarSet implements Iterable<Var> {
     }
 
     VarAssignment getAssignment(int idx) {
-        Preconditions.checkArgument(idx < getMaxIndex());
+        Preconditions.checkArgument(idx < getCardinality());
         int[] values = new int[vars.length];
         Arrays.fill(values, -1);
 
@@ -160,7 +160,7 @@ public class VarSet implements Iterable<Var> {
     }
 
     public Iterable<VarAssignment> assignments() {
-        VarAssignment[] assignments = new VarAssignment[getMaxIndex()];
+        VarAssignment[] assignments = new VarAssignment[getCardinality()];
         for (int i = 0; i < assignments.length; i++) {
             assignments[i] = getAssignment(i);
         }

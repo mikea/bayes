@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.ObjectArrays;
 import com.mikea.bayes.BayesianNetwork;
 import com.mikea.bayes.Factor;
+import com.mikea.bayes.ProbabilitySpace;
 import com.mikea.bayes.Var;
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -30,6 +31,8 @@ import static java.util.Arrays.asList;
  */
 public class HuginNetFile {
     public static BayesianNetwork loadNetFile(InputStream stream) throws IOException {
+        final ProbabilitySpace space = new ProbabilitySpace();  // todo: name after file.
+
         Tree tree = parse(stream);
 
         final Map<String, Var> vars = newLinkedHashMap();
@@ -38,7 +41,7 @@ public class HuginNetFile {
             @Override
             public void visitNode(Tree node, String name, Tree attrList) {
                 String[] states = getProperty(attrList, "states", String[].class);
-                vars.put(name, new Var(name, states.length, states));
+                vars.put(name, space.newVar(name, states.length, states));
             }
         });
 
@@ -270,19 +273,8 @@ public class HuginNetFile {
     }
 
     static class VisitException extends RuntimeException {
-        VisitException() {
-        }
-
-        VisitException(String message) {
-            super(message);
-        }
-
         VisitException(String message, Throwable cause) {
             super(message, cause);
-        }
-
-        VisitException(Throwable cause) {
-            super(cause);
         }
     }
 }

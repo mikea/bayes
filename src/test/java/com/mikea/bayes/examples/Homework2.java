@@ -2,6 +2,7 @@ package com.mikea.bayes.examples;
 
 import com.mikea.bayes.BayesianNetwork;
 import com.mikea.bayes.IMap;
+import com.mikea.bayes.ProbabilitySpace;
 import com.mikea.bayes.Var;
 import org.junit.Test;
 
@@ -15,10 +16,12 @@ import static org.junit.Assert.assertTrue;
 public class Homework2 {
     @Test
     public void testImap1() throws Exception {
-        Var a = new Var("A", 2);
-        Var b = new Var("B", 2);
-        Var c = new Var("C", 2);
-        Var d = new Var("D", 2);
+        ProbabilitySpace space = new ProbabilitySpace();
+
+        Var a = space.newVar("A", 2);
+        Var b = space.newVar("B", 2);
+        Var c = space.newVar("C", 2);
+        Var d = space.newVar("D", 2);
 
         BayesianNetwork g = BayesianNetwork
                 .withVariables(a, b, c, d)
@@ -39,11 +42,12 @@ public class Homework2 {
 
     @Test
     public void testImap() throws Exception {
-        Var a = new Var("A", 2);
-        Var b = new Var("B", 2);
-        Var c = new Var("C", 2);
-        Var d = new Var("D", 2);
-        Var e = new Var("E", 2);
+        ProbabilitySpace space = new ProbabilitySpace();
+        Var a = space.newVar("A", 2);
+        Var b = space.newVar("B", 2);
+        Var c = space.newVar("C", 2);
+        Var d = space.newVar("D", 2);
+        Var e = space.newVar("E", 2);
 
         BayesianNetwork g = BayesianNetwork
                 .withVariables(a, b, c, d, e)
@@ -114,11 +118,12 @@ public class Homework2 {
 
     @Test
     public void testIEquivalent() throws Exception {
-        Var a = new Var("A", 2);
-        Var b = new Var("B", 2);
-        Var c = new Var("C", 2);
-        Var d = new Var("D", 2);
-        Var e = new Var("E", 2);
+        ProbabilitySpace space = new ProbabilitySpace();
+        Var a = space.newVar("A", 2);
+        Var b = space.newVar("B", 2);
+        Var c = space.newVar("C", 2);
+        Var d = space.newVar("D", 2);
+        Var e = space.newVar("E", 2);
 
         BayesianNetwork g = BayesianNetwork
                 .withVariables(a, b, c, d, e)

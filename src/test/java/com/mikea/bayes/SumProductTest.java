@@ -12,9 +12,10 @@ import static org.junit.Assert.assertEquals;
  * @author mike.aizatsky@gmail.com
  */
 public class SumProductTest {
-    private static final Var var1 = new Var("1", 2);
-    private static final Var var2 = new Var("2", 2);
-    private static final Var var3 = new Var("3", 2);
+    private static final ProbabilitySpace space = new ProbabilitySpace("SumProductTest");
+    private static final Var var1 = space.newVar("1", 2);
+    private static final Var var2 = space.newVar("2", 2);
+    private static final Var var3 = space.newVar("3", 2);
 
     @Test
     public void testSumProduct() throws Exception {

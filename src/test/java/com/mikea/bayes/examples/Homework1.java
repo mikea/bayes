@@ -3,6 +3,7 @@ package com.mikea.bayes.examples;
 import com.mikea.bayes.BayesianNetwork;
 import com.mikea.bayes.DSeparation;
 import com.mikea.bayes.Factor;
+import com.mikea.bayes.ProbabilitySpace;
 import com.mikea.bayes.Var;
 import org.junit.Test;
 
@@ -20,10 +21,11 @@ public class Homework1 {
 
     @Test
     public void testInterCasualReasoning() throws Exception {
+        ProbabilitySpace space = new ProbabilitySpace();
         // P, A, T
-        Var P = new Var("P", 2);
-        Var A = new Var("A", 2);
-        Var T = new Var("T", 2);
+        Var P = space.newVar("P", 2);
+        Var A = space.newVar("A", 2);
+        Var T = space.newVar("T", 2);
 
         Factor fp = newFactor(vars(P), new double[]{0.99, 0.01});
         Factor fa = newFactor(vars(A), new double[]{0.9, 0.1});
@@ -57,12 +59,13 @@ public class Homework1 {
 
     @Test
     public void testDSeparation() throws Exception {
+        ProbabilitySpace space = new ProbabilitySpace();
         // A, B, C, D, E
-        Var A = new Var("A", 2);
-        Var B = new Var("B", 2);
-        Var C = new Var("C", 2);
-        Var D = new Var("D", 2);
-        Var E = new Var("E", 2);
+        Var A = space.newVar("A", 2);
+        Var B = space.newVar("B", 2);
+        Var C = space.newVar("C", 2);
+        Var D = space.newVar("D", 2);
+        Var E = space.newVar("E", 2);
 
         BayesianNetwork network = BayesianNetwork
                 .withVariables(A, B, C, D, E)

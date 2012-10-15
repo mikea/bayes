@@ -8,12 +8,13 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author mike.aizatsky@gmail.com
  */
-public class BNFixture {
-    public static final Var D = new Var("D", 2);
-    public static final Var I = new Var("I", 2);
-    public static final Var G = new Var("G", 3);
-    public static final Var S = new Var("S", 2);
-    public static final Var L = new Var("L", 2);
+public class StudentsNetwork {
+    public static final ProbabilitySpace space = new ProbabilitySpace("StudentsNetwork");
+    public static final Var D = space.newVar("D", 2);
+    public static final Var I = space.newVar("I", 2);
+    public static final Var G = space.newVar("G", 3);
+    public static final Var S = space.newVar("S", 2);
+    public static final Var L = space.newVar("L", 2);
 
     public static BayesianNetwork buildStudentsNetwork() {
         Factor factorD = newFactor(vars(D), new double[]{0.6, 0.4});

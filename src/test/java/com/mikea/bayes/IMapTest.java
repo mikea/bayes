@@ -10,12 +10,13 @@ import static org.junit.Assert.assertEquals;
 public class IMapTest {
     @Test
     public void testImap1() throws Exception {
+        ProbabilitySpace space = new ProbabilitySpace();
         // A, B, C, D, E
-        Var A = new Var("A", 2);
-        Var B = new Var("B", 2);
-        Var C = new Var("C", 2);
-        Var D = new Var("D", 2);
-        Var E = new Var("E", 2);
+        Var A = space.newVar("A", 2);
+        Var B = space.newVar("B", 2);
+        Var C = space.newVar("C", 2);
+        Var D = space.newVar("D", 2);
+        Var E = space.newVar("E", 2);
 
         BayesianNetwork network = BayesianNetwork
                 .withVariables(A, B, C, D, E)

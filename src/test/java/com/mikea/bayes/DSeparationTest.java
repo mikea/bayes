@@ -11,11 +11,13 @@ import static com.mikea.bayes.VarSet.newVarSet;
 public class DSeparationTest {
     @Test
     public void testGraph1() throws Exception {
+        ProbabilitySpace space = new ProbabilitySpace();
+
         // Example 3.6 in Koller
-        Var W = new Var("W", 2);
-        Var X = new Var("X", 2);
-        Var Y = new Var("Y", 2);
-        Var Z = new Var("Z", 2);
+        Var W = space.newVar("W", 2);
+        Var X = space.newVar("X", 2);
+        Var Y = space.newVar("Y", 2);
+        Var Z = space.newVar("Z", 2);
 
         BayesianNetwork network = BayesianNetwork
                 .withVariables(W, X, Y, Z)
@@ -31,12 +33,14 @@ public class DSeparationTest {
 
     @Test
     public void testGraph2() throws Exception {
+        ProbabilitySpace space = new ProbabilitySpace();
+
         // A, B, C, D, E
-        Var A = new Var("A", 2);
-        Var B = new Var("B", 2);
-        Var C = new Var("C", 2);
-        Var D = new Var("D", 2);
-        Var E = new Var("E", 2);
+        Var A = space.newVar("A", 2);
+        Var B = space.newVar("B", 2);
+        Var C = space.newVar("C", 2);
+        Var D = space.newVar("D", 2);
+        Var E = space.newVar("E", 2);
 
         BayesianNetwork network = BayesianNetwork
                 .withVariables(A, B, C, D, E)

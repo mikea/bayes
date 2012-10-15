@@ -29,15 +29,17 @@ public class Var {
         }
     };
 
+    private final ProbabilitySpace space;
+    private final int index;
     private final String name;
     private final int card;
     private final String[] stateNames;
 
-    public Var(String name, int card) {
-        this(name, card, null);
-    }
-
-    public Var(String name, int card, @Nullable String[] stateNames) {
+    protected Var(ProbabilitySpace space,
+                  int index,
+                  String name, int card, @Nullable String[] stateNames) {
+        this.space = space;
+        this.index = index;
         this.name = name;
         this.card = card;
         this.stateNames = stateNames;
@@ -105,5 +107,13 @@ public class Var {
 
             throw new NoSuchElementException();
         }
+    }
+
+    public int getIndex() {
+        return  index;
+    }
+
+    public ProbabilitySpace getProbabilitySpace() {
+        return space;
     }
 }

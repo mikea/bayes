@@ -4,12 +4,12 @@ import com.mikea.bayes.BayesianNetwork;
 import com.mikea.bayes.Factor;
 import org.junit.Test;
 
-import static com.mikea.bayes.BNFixture.D;
-import static com.mikea.bayes.BNFixture.G;
-import static com.mikea.bayes.BNFixture.I;
-import static com.mikea.bayes.BNFixture.L;
-import static com.mikea.bayes.BNFixture.S;
-import static com.mikea.bayes.BNFixture.buildStudentsNetwork;
+import static com.mikea.bayes.StudentsNetwork.D;
+import static com.mikea.bayes.StudentsNetwork.G;
+import static com.mikea.bayes.StudentsNetwork.I;
+import static com.mikea.bayes.StudentsNetwork.L;
+import static com.mikea.bayes.StudentsNetwork.S;
+import static com.mikea.bayes.StudentsNetwork.buildStudentsNetwork;
 import static com.mikea.bayes.Var.vars;
 import static com.mikea.bayes.VarAssignment.at;
 import static com.mikea.bayes.VarSet.newVarSet;

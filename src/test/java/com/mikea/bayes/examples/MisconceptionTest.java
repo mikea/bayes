@@ -1,6 +1,7 @@
 package com.mikea.bayes.examples;
 
 import com.mikea.bayes.Factor;
+import com.mikea.bayes.ProbabilitySpace;
 import com.mikea.bayes.Var;
 import org.junit.Test;
 
@@ -15,10 +16,12 @@ import static org.junit.Assert.assertEquals;
 public class MisconceptionTest {
     @Test
     public void testMisconceptionFactors() throws Exception {
-        Var a = new Var("A", 2);
-        Var b = new Var("B", 2);
-        Var c = new Var("C", 2);
-        Var d = new Var("D", 2);
+        ProbabilitySpace space = new ProbabilitySpace();
+
+        Var a = space.newVar("A", 2);
+        Var b = space.newVar("B", 2);
+        Var c = space.newVar("C", 2);
+        Var d = space.newVar("D", 2);
 
         Factor phi1 = Factor
                 .withVariables(a, b)

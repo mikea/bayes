@@ -5,6 +5,7 @@ import com.google.caliper.Runner;
 import com.google.caliper.SimpleBenchmark;
 import com.mikea.bayes.BayesianNetwork;
 import com.mikea.bayes.Factor;
+import com.mikea.bayes.ProbabilitySpace;
 import com.mikea.bayes.Var;
 
 /**
@@ -21,9 +22,11 @@ public class LinearGraphBenchmark extends SimpleBenchmark {
     protected void setUp() throws Exception {
         super.setUp();
 
+        ProbabilitySpace space = new ProbabilitySpace();
+
         Var[] vars = new Var[size];
         for (int i = 0; i < size; ++i) {
-            vars[i] = new Var(String.valueOf(i), 2);
+            vars[i] = space.newVar(String.valueOf(i), 2);
         }
 
         BayesianNetwork.Builder networkBuilder = BayesianNetwork.withVariables(vars);

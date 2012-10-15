@@ -31,7 +31,7 @@ public class Factor {
     private final double[] values;
 
     private Factor(VarSet scope, double[] values) {
-        checkArgument(scope.getMaxIndex() == values.length);
+        checkArgument(scope.getCardinality() == values.length);
         this.scope = scope;
         this.values = values;
     }
@@ -68,10 +68,10 @@ public class Factor {
         });
 
         VarSet productVarSet = VarSet.product(varSets);
-        int numValues = productVarSet.getMaxIndex();
+        int numValues = productVarSet.getCardinality();
         double[] values = new double[numValues];
 
-        for (int i = 0; i < productVarSet.getMaxIndex(); ++i) {
+        for (int i = 0; i < productVarSet.getCardinality(); ++i) {
             double value = 1;
 
             for (Factor factor : factors) {
@@ -173,7 +173,7 @@ public class Factor {
      */
     public Factor marginalize(VarSet vars) {
         VarSet newVarSet = scope.removeVars(vars);
-        double[] newValues = new double[newVarSet.getMaxIndex()];
+        double[] newValues = new double[newVarSet.getCardinality()];
 
         for (int i = 0; i < values.length; ++i) {
             VarAssignment assignment = scope.getAssignment(i);
@@ -301,7 +301,7 @@ public class Factor {
 
         public Builder withVariables(Var[] vars) {
             this.varSet = newVarSet(vars);
-            this.values = new double[varSet.getMaxIndex()];
+            this.values = new double[varSet.getCardinality()];
             return this;
         }
 

@@ -15,9 +15,10 @@ import static org.junit.Assert.assertEquals;
  * @author mike.aizatsky@gmail.com
  */
 public class FactorTest {
-    private static final Var var1 = new Var("1", 2);
-    private static final Var var2 = new Var("2", 2);
-    private static final Var var3 = new Var("3", 2);
+    private static final ProbabilitySpace space = new ProbabilitySpace("VarSetTest");
+    private static final Var var1 = space.newVar("1", 2);
+    private static final Var var2 = space.newVar("2", 2);
+    private static final Var var3 = space.newVar("3", 2);
 
     @Test
     public void testToString() throws Exception {
@@ -180,7 +181,7 @@ public class FactorTest {
 
     @Test
     public void testInducedMarkovNetwork() throws Exception {
-        Factor[] factors = BNFixture.buildStudentsNetwork().getFactors();
+        Factor[] factors = StudentsNetwork.buildStudentsNetwork().getFactors();
         DataGraph<Var, List<Factor>> network = Factor.induceMarkovNetwork(factors);
 
         assertEquals("DataGraphImpl{isDirected=false, [\n" +

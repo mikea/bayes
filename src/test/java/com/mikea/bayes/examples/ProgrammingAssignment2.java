@@ -1,6 +1,7 @@
 package com.mikea.bayes.examples;
 
 import com.mikea.bayes.Factor;
+import com.mikea.bayes.ProbabilitySpace;
 import com.mikea.bayes.Var;
 import com.mikea.bayes.VarAssignment;
 import org.junit.Test;
@@ -19,11 +20,12 @@ import static org.junit.Assert.assertEquals;
 public class ProgrammingAssignment2 {
     @Test
     public void testPhenotypeGivenGenotypeMendelianFactor() throws Exception {
+        ProbabilitySpace space = new ProbabilitySpace();
         // 0 - FF
         // 1 - Ff
         // 2 - ff
-        Var genotype = new Var("genotype", 3, strings("FF", "Ff", "ff"));
-        Var phenotype = new Var("phenotype", 2, strings("F", "T"));
+        Var genotype = space.newVar("genotype", 3, strings("FF", "Ff", "ff"));
+        Var phenotype = space.newVar("phenotype", 2, strings("F", "T"));
 
         assertEquals(
                 "Factor({phenotype(2, [F, T]), genotype(3, [FF, Ff, ff])}):\n" +
@@ -42,8 +44,9 @@ public class ProgrammingAssignment2 {
 
     @Test
     public void testPhenotypeGivenGenotypeFactor() throws Exception {
-        Var genotype = new Var("genotype", 3);
-        Var phenotype = new Var("phenotype", 2);
+        ProbabilitySpace space = new ProbabilitySpace();
+        Var genotype = space.newVar("genotype", 3);
+        Var phenotype = space.newVar("phenotype", 2);
 
         assertEquals("Factor({phenotype(2), genotype(3)}):\n" +
                 "{genotype=0}: 0.2 0.8\n" +
@@ -54,16 +57,18 @@ public class ProgrammingAssignment2 {
 
     @Test
     public void testGenotypeGivenAlleleFreqsFactor() throws Exception {
-        Var genotype = new Var("genotype", 3);
+        ProbabilitySpace space = new ProbabilitySpace();
+        Var genotype = space.newVar("genotype", 3);
         assertEquals("Factor({genotype(3)}, [0.010000000000000002, 0.18000000000000002, 0.81])",
                 getGenotypeGivenAlleleFreqsFactor(genotype, new double[]{0.1, 0.9}).toString());
     }
 
     @Test
     public void testGenotypeGivenParentsGenotypesFactor() throws Exception {
-        Var genotypeParent1 = new Var("p1", 3);
-        Var genotypeParent2 = new Var("p2", 3);
-        Var genotypeChild = new Var("c", 3);
+        ProbabilitySpace space = new ProbabilitySpace();
+        Var genotypeParent1 = space.newVar("p1", 3);
+        Var genotypeParent2 = space.newVar("p2", 3);
+        Var genotypeChild = space.newVar("c", 3);
 
         assertEquals(
                 "Factor({c(3), p1(3), p2(3)}):\n" +

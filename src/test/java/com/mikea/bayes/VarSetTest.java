@@ -10,11 +10,12 @@ import static org.junit.Assert.assertTrue;
  * @author mike.aizatsky@gmail.com
  */
 public class VarSetTest {
-    private static final Var var0 = new Var("0", 1);
-    private static final Var var1 = new Var("1", 2);
-    private static final Var var2 = new Var("2", 2);
-    private static final Var var3 = new Var("3", 3);
-    private static final Var var4 = new Var("4", 4);
+    private static final ProbabilitySpace space = new ProbabilitySpace("VarSetTest");
+    private static final Var var0 = space.newVar("0", 1);
+    private static final Var var1 = space.newVar("1", 2);
+    private static final Var var2 = space.newVar("2", 2);
+    private static final Var var3 = space.newVar("3", 3);
+    private static final Var var4 = space.newVar("4", 4);
 
     @Test
     public void testToString() throws Exception {
@@ -61,7 +62,7 @@ public class VarSetTest {
     }
 
     private void verifyGetIndex(VarSet v) {
-        for (int i = 0; i < v.getMaxIndex(); ++i) {
+        for (int i = 0; i < v.getCardinality(); ++i) {
             assertEquals(i, v.getIndex(v.getAssignment(i)));
         }
     }
@@ -112,7 +113,7 @@ public class VarSetTest {
 
     private String getAssignmentOrder(VarSet v) {
         StringBuilder order = new StringBuilder();
-        for (int i = 0; i < v.getMaxIndex(); ++i) {
+        for (int i = 0; i < v.getCardinality(); ++i) {
             if (i > 0) order.append("\n");
             order.append(v.getAssignment(i).toString());
         }
