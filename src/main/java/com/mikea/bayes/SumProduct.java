@@ -60,7 +60,6 @@ public class SumProduct {
         Var pickVar(ProbabilitySpace space, Set<Var> vars, List<Factor> factors);
     }
 
-    // todo: add min-fill & weighted-min-fill strategies.
     public static abstract class GreedyOrderStrategy implements VarOrderStrategy {
         public abstract void computeCosts(int[] costs, Set<Var> vars, List<Factor> factors);
 

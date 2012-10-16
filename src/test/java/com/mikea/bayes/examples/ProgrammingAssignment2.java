@@ -28,14 +28,14 @@ public class ProgrammingAssignment2 {
         Var phenotype = space.newVar("phenotype", 2, strings("F", "T"));
 
         assertEquals(
-                "Factor({phenotype(2, [F, T]), genotype(3, [FF, Ff, ff])}):\n" +
+                "Factor({phenotype, genotype}):\n" +
                         "{genotype=FF}: 0.0 1.0\n" +
                         "{genotype=Ff}: 0.0 1.0\n" +
                         "{genotype=ff}: 1.0 0.0\n",
                 getPhenotypeGivenGenotypeMendelianFactor(true, genotype, phenotype).toStringAsTable(phenotype, "%.1f"));
 
         assertEquals(
-                "Factor({phenotype(2, [F, T]), genotype(3, [FF, Ff, ff])}):\n" +
+                "Factor({phenotype, genotype}):\n" +
                         "{genotype=FF}: 1.0 0.0\n" +
                         "{genotype=Ff}: 1.0 0.0\n" +
                         "{genotype=ff}: 0.0 1.0\n",
@@ -48,7 +48,7 @@ public class ProgrammingAssignment2 {
         Var genotype = space.newVar("genotype", 3);
         Var phenotype = space.newVar("phenotype", 2);
 
-        assertEquals("Factor({phenotype(2), genotype(3)}):\n" +
+        assertEquals("Factor({phenotype, genotype}):\n" +
                 "{genotype=0}: 0.2 0.8\n" +
                 "{genotype=1}: 0.4 0.6\n" +
                 "{genotype=2}: 0.9 0.1\n",
@@ -59,7 +59,7 @@ public class ProgrammingAssignment2 {
     public void testGenotypeGivenAlleleFreqsFactor() throws Exception {
         ProbabilitySpace space = new ProbabilitySpace();
         Var genotype = space.newVar("genotype", 3);
-        assertEquals("Factor({genotype(3)}, [0.010000000000000002, 0.18000000000000002, 0.81])",
+        assertEquals("Factor({genotype}, [0.010000000000000002, 0.18000000000000002, 0.81])",
                 getGenotypeGivenAlleleFreqsFactor(genotype, new double[]{0.1, 0.9}).toString());
     }
 
@@ -71,7 +71,7 @@ public class ProgrammingAssignment2 {
         Var genotypeChild = space.newVar("c", 3);
 
         assertEquals(
-                "Factor({c(3), p1(3), p2(3)}):\n" +
+                "Factor({c, p1, p2}):\n" +
                         "{p1=0, p2=0}: 1.00 0.00 0.00\n" +
                         "{p1=0, p2=1}: 0.50 0.50 0.00\n" +
                         "{p1=0, p2=2}: 0.00 1.00 0.00\n" +

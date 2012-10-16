@@ -25,7 +25,7 @@ public class VarSet implements Iterable<Var> {
         this.set = ImmutableSet.copyOf(vars);
     }
 
-    public static VarSet product(Iterable<VarSet> varSets) {
+    public static VarSet union(Iterable<VarSet> varSets) {
         Preconditions.checkArgument(!Iterables.isEmpty(varSets));
         Set<Var> variables = newHashSet();
         for (VarSet varSet : varSets) {
@@ -35,13 +35,13 @@ public class VarSet implements Iterable<Var> {
         return newVarSet(variables);
     }
 
-    public static VarSet product(VarSet...varSets) {
-        return product(Arrays.asList(varSets));
+    public static VarSet union(VarSet... varSets) {
+        return union(Arrays.asList(varSets));
     }
 
     @Override
     public String toString() {
-        return toString(true);
+        return toString(false);
     }
 
     public String toString(boolean showCardinalities) {

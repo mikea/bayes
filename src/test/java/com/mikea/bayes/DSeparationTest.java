@@ -27,7 +27,7 @@ public class DSeparationTest {
                 .edge(Z, X)
                 .build();
 
-        Assert.assertEquals("{Y(2)}", DSeparation.findDSeparation(network, X, newVarSet(Y)).toString());
+        Assert.assertEquals("{Y}", DSeparation.findDSeparation(network, X, newVarSet(Y)).toString());
         Assert.assertEquals("{}", DSeparation.findDSeparation(network, X, newVarSet()).toString());
     }
 

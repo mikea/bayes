@@ -51,9 +51,9 @@ public class Homework1 {
                 .factor(T, ft)
                 .build();
 
-        assertEquals("Factor({A(2)}, [0.6521739130434783, 0.3478260869565217])",
+        assertEquals("Factor({A}, [0.6521739130434783, 0.3478260869565217])",
                 network.query(newVarSet(A), vars(T), new int[]{1}).toString());
-        assertEquals("Factor({A(2)}, [0.8571428571428572, 0.14285714285714288])",
+        assertEquals("Factor({A}, [0.8571428571428572, 0.14285714285714288])",
                 network.query(newVarSet(A), vars(T, P), new int[]{1, 1}).toString());
     }
 

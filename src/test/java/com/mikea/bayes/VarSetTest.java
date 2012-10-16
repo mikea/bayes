@@ -3,6 +3,7 @@ package com.mikea.bayes;
 import org.junit.Test;
 
 import static com.mikea.bayes.VarSet.newVarSet;
+import static com.mikea.bayes.VarSet.union;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -23,9 +24,10 @@ public class VarSetTest {
         VarSet v2 = newVarSet(var2, var1);
         VarSet v3 = newVarSet(var3, var2);
 
-        assertEquals("{1(2)}", v1.toString());
-        assertEquals("{2(2), 1(2)}", v2.toString());
-        assertEquals("{3(3), 2(2)}", v3.toString());
+        assertEquals("{1}", v1.toString());
+        assertEquals("{2, 1}", v2.toString());
+        assertEquals("{3, 2}", v3.toString());
+        assertEquals("{3(3), 2(2)}", v3.toString(true));
     }
 
     @Test
@@ -38,15 +40,15 @@ public class VarSetTest {
     }
 
     @Test
-    public void testProduct() throws Exception {
+    public void testUnion() throws Exception {
         VarSet v1 = newVarSet(var1);
         VarSet v2 = newVarSet(var2, var1);
         VarSet v3 = newVarSet(var3, var2);
 
-        assertEquals("{1(2), 2(2)}", VarSet.product(v1, v2).toString());
-        assertEquals("{1(2), 2(2), 3(3)}", VarSet.product(v1, v3).toString());
-        assertEquals("{1(2), 2(2), 3(3)}", VarSet.product(v2, v3).toString());
-        assertEquals("{1(2), 2(2), 3(3)}", VarSet.product(v1, v2, v3).toString());
+        assertEquals("{1, 2}", union(v1, v2).toString());
+        assertEquals("{1, 2, 3}", union(v1, v3).toString());
+        assertEquals("{1, 2, 3}", union(v2, v3).toString());
+        assertEquals("{1, 2, 3}", union(v1, v2, v3).toString());
     }
 
     @Test
@@ -126,6 +128,6 @@ public class VarSetTest {
         VarSet v1 = newVarSet(var1, var2);
         VarSet v2 = newVarSet(var2);
 
-        assertEquals("{1(2)}", v1.removeVars(v2).toString());
+        assertEquals("{1}", v1.removeVars(v2).toString());
     }
 }

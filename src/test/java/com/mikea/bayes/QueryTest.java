@@ -63,9 +63,9 @@ public class QueryTest {
 
         BayesianNetwork network = networkBuilder.build();
 
-        assertEquals("Factor({0(2)}, [0.5, 0.5])", network.query(algorithm, vars[0]).toString());
-        assertEquals("Factor({0(2), 1(2)}, [0.25, 0.25, 0.25, 0.25])", network.query(algorithm, vars[0], vars[1]).toString());
-        assertEquals("Factor({0(2)}, [0.5, 0.5])", network.query(algorithm, newVarSet(vars[0]), new Var[] {vars[1]}, new int[] {0}).toString());
+        assertEquals("Factor({0}, [0.5, 0.5])", network.query(algorithm, vars[0]).toString());
+        assertEquals("Factor({0, 1}, [0.25, 0.25, 0.25, 0.25])", network.query(algorithm, vars[0], vars[1]).toString());
+        assertEquals("Factor({0}, [0.5, 0.5])", network.query(algorithm, newVarSet(vars[0]), new Var[] {vars[1]}, new int[] {0}).toString());
     }
 
     @Test
@@ -79,13 +79,13 @@ public class QueryTest {
 
 
         // Cross checked with SamIam hugin algo.
-        assertEquals("Factor({JasonGenotype(3, [FF, Ff, ff])}, [0.0100, 0.1800, 0.8100])",
+        assertEquals("Factor({JasonGenotype}, [0.0100, 0.1800, 0.8100])",
                 network.query(algorithm, jasonGenotype).toString("%.4f"));
-        assertEquals("Factor({JasonPhenotype(2, [CysticFibrosis, NoCysticFibrosis])}, [0.1970, 0.8030])",
+        assertEquals("Factor({JasonPhenotype}, [0.1970, 0.8030])",
                 network.query(algorithm, jasonPhenotype).toString("%.4f"));
-        assertEquals("Factor({JasonPhenotype(2, [CysticFibrosis, NoCysticFibrosis])}, [0.2475, 0.7525])",
+        assertEquals("Factor({JasonPhenotype}, [0.2475, 0.7525])",
                 network.query(algorithm, vars(jasonPhenotype), vars(evaPhenotype), strings("CysticFibrosis")).toString("%.4f"));
-        assertEquals("Factor({JasonPhenotype(2, [CysticFibrosis, NoCysticFibrosis])}, [0.6415, 0.3585])",
+        assertEquals("Factor({JasonPhenotype}, [0.6415, 0.3585])",
                 network.query(algorithm, vars(jasonPhenotype), vars(evaPhenotype, reneGenotype), strings("CysticFibrosis", "FF")).toString("%.4f"));
     }
 }

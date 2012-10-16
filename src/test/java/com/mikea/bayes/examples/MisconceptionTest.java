@@ -50,7 +50,7 @@ public class MisconceptionTest {
         Factor unnormalizedMeasure = Factor.product(phi1, phi2, phi3, phi4);
 
         assertEquals(
-                "Factor({A(2), B(2), C(2), D(2)}):\n" +
+                "Factor({A, B, C, D}):\n" +
                         "{A=0, B=0, C=0, D=0}:    300,000.0\n" +
                         "{A=0, B=0, C=0, D=1}:    300,000.0\n" +
                         "{A=0, B=0, C=1, D=0}:    300,000.0\n" +

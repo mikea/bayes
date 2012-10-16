@@ -42,7 +42,7 @@ public class HuginNetFileTest {
         Factor jasonGenotypeFactor = network.getFactor(jasonGenotype);
 
         assertEquals(
-                "Factor({ReneGenotype(3, [FF, Ff, ff]), JamesGenotype(3, [FF, Ff, ff]), JasonGenotype(3, [FF, Ff, ff])}):\n" +
+                "Factor({ReneGenotype, JamesGenotype, JasonGenotype}):\n" +
                         "{ReneGenotype=FF, JamesGenotype=FF, JasonGenotype=FF}: 1.000000\n" +
                         "{ReneGenotype=FF, JamesGenotype=FF, JasonGenotype=Ff}: 0.000000\n" +
                         "{ReneGenotype=FF, JamesGenotype=FF, JasonGenotype=ff}: 0.000000\n" +

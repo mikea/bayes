@@ -67,7 +67,7 @@ public class Factor {
             }
         });
 
-        VarSet productVarSet = VarSet.product(varSets);
+        VarSet productVarSet = VarSet.union(varSets);
         int numValues = productVarSet.getCardinality();
         double[] values = new double[numValues];
 
@@ -255,7 +255,7 @@ public class Factor {
     }
 
     public static DataGraph<Var, List<Factor>> induceMarkovNetwork(Factor... factors) {
-        VarSet vars = VarSet.product(Iterables.transform(Arrays.asList(factors), new Function<Factor, VarSet>() {
+        VarSet vars = VarSet.union(Iterables.transform(Arrays.asList(factors), new Function<Factor, VarSet>() {
             @Nullable
             @Override
             public VarSet apply(@Nullable Factor input) {
