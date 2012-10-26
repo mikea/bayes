@@ -11,6 +11,7 @@ import org.gga.graph.search.dfs.AbstractDfsVisitor;
 import org.gga.graph.util.Pair;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -161,6 +162,11 @@ public class BayesianNetwork {
         return factors;
     }
 
+    @Nonnull
+    public List<Factor> getFactorList() {
+        return Arrays.asList(factors);
+    }
+
     public static Builder withVariables(Iterable<Var> vars) {
         return withVariables(Iterables.toArray(vars, Var.class));
     }
@@ -188,7 +194,7 @@ public class BayesianNetwork {
         }
 
         public BayesianNetwork build() {
-            DataGraphImpl<Var, Void> g = new DataGraphImpl<Var, Void>(vars.length, true);
+            DataGraphImpl<Var, Void> g = new DataGraphImpl<Var, Void>(Var.class, vars.length, true);
             for (int i = 0; i < vars.length; i++) {
                 g.setNode(i, vars[i]);
             }

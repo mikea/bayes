@@ -39,6 +39,14 @@ public class VarSet implements Iterable<Var> {
         return union(Arrays.asList(varSets));
     }
 
+    public VarSet add(Var...vars) {
+        return union(this, newVarSet(vars));
+    }
+
+    public VarSet add(VarSet varSet) {
+        return union(this, varSet);
+    }
+
     @Override
     public String toString() {
         return toString(false);
@@ -173,5 +181,19 @@ public class VarSet implements Iterable<Var> {
 
     public Set<Var> getVarSet() {
         return set;
+    }
+
+    public boolean isEmpty() {
+        return set.isEmpty();
+    }
+
+    public static VarSet interesct(VarSet...varSets) {
+        Set<Var> vars = varSets[0].getVarSet();
+
+        for (int i = 1; i < varSets.length; i++) {
+            VarSet varSet = varSets[i];
+            vars = Sets.intersection(vars, varSet.getVarSet());
+        }
+        return newVarSet(vars);
     }
 }

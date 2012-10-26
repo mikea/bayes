@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mikea.bayes.VarSet.newVarSet;
 import static org.gga.graph.impl.DataGraphImpl.newDataGraph;
@@ -84,6 +85,16 @@ public class Factor {
         }
 
         return Factor.newFactor(productVarSet, values);
+    }
+
+    static List<VarSet> getScopes(List<Factor> factors) {
+        return transform(factors, new Function<Factor, VarSet>() {
+            @Nullable
+            @Override
+            public VarSet apply(@Nullable Factor input) {
+                return checkNotNull(input).getScope();
+            }
+        });
     }
 
     @Override
@@ -263,7 +274,7 @@ public class Factor {
             }
         }));
 
-        DataGraph<Var, List<Factor>> graph = newDataGraph(vars.size(), false);
+        DataGraph<Var, List<Factor>> graph = newDataGraph(Var.class, vars.size(), false);
 
         int i = 0;
         for (Var var : vars) {

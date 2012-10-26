@@ -1,9 +1,15 @@
 package com.mikea.bayes;
 
+import com.google.common.base.Function;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.mikea.bayes.belief.ClusterGraph;
+import com.mikea.bayes.belief.ClusterGraphImpl;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -16,10 +22,12 @@ import static com.mikea.bayes.VarSet.newVarSet;
  * @author mike.aizatsky@gmail.com
  */
 public class SumProduct {
+    public static final VarOrderStrategy DEFAULT_STRATEGY = new MinNeighborsStrategy();
+
     public static Factor sumProductVariableElimination(
             Iterable<Var> vars,
             List<Factor> factors) {
-        return sumProductVariableElimination(vars, factors, new MinNeighborsStrategy());
+        return sumProductVariableElimination(vars, factors, DEFAULT_STRATEGY);
     }
 
     public static Factor sumProductVariableElimination(
@@ -29,10 +37,88 @@ public class SumProduct {
         return sumProductVariableElimination(ProbabilitySpace.get(vars), vars, factors, strategy);
     }
 
+    public static ClusterGraph buildCliqueGraph(
+            Iterable<Var> vars,
+            List<Factor> factors) {
+        return buildCliqueGraph(vars, factors, DEFAULT_STRATEGY);
+    }
+
+    private static ClusterGraph buildCliqueGraph(Iterable<Var> vars, List<Factor> factors, VarOrderStrategy strategy) {
+        ProbabilitySpace space = ProbabilitySpace.get(vars);
+        List<VarSetHolder> scopes = newArrayList(Lists.transform(newArrayList(Factor.getScopes(factors)), new Function<VarSet, VarSetHolder>() {
+            @Nullable
+            @Override
+            public VarSetHolder apply(@Nullable VarSet input) {
+                return new VarSetHolder(checkNotNull(input), null);
+            }
+        }));
+
+        ClusterGraphImpl.Builder builder = new ClusterGraphImpl.Builder(false);
+        Set<Var> varsToEliminate = newHashSet(vars);
+
+        while (!varsToEliminate.isEmpty()) {
+            Var var = strategy.pickVar(space, varsToEliminate, Lists.transform(scopes, new Function<VarSetHolder, VarSet>() {
+                @Nullable
+                @Override
+                public VarSet apply(@Nullable VarSetHolder input) {
+                    return checkNotNull(input).varSet;
+                }
+            }));
+            varsToEliminate.remove(var);
+
+            VarSet clique = newVarSet(var);
+
+            List<VarSet> srcs = newArrayList();
+
+            for (Iterator<VarSetHolder> i = scopes.iterator(); i.hasNext(); ) {
+                VarSetHolder holder = i.next();
+                VarSet scope = holder.varSet;
+                if (scope.contains(var)) {
+                    i.remove();
+                    clique = clique.add(scope);
+                    if (holder.clique != null) {
+                        srcs.add(holder.clique);
+                    }
+                }
+            }
+
+
+            builder.addNode(clique);
+            for (VarSet src : srcs) {
+                builder.addEdge(src, clique, VarSet.interesct(src, clique));
+            }
+
+            VarSet newScope = clique.removeVars(var);
+            if (!newScope.isEmpty()) {
+                scopes.add(new VarSetHolder(newScope, clique));
+            }
+        }
+
+        return builder.build();
+    }
+
+    private static class VarSetHolder {
+        private final VarSet varSet;
+        private final VarSet clique;
+
+        private VarSetHolder(VarSet varSet, @Nullable VarSet clique) {
+            this.varSet = varSet;
+            this.clique = clique;
+        }
+
+        @Override
+        public String toString() {
+            return "VarSetHolder{" +
+                    "varSet=" + varSet +
+                    ", clique=" + clique +
+                    '}';
+        }
+    }
+
     private static Factor sumProductVariableElimination(ProbabilitySpace space, Iterable<Var> vars, List<Factor> factors, VarOrderStrategy strategy) {
         Set<Var> varSet = newHashSet(vars);
         while (!varSet.isEmpty()) {
-            Var var = strategy.pickVar(space, varSet, factors);
+            Var var = strategy.pickVar(space, varSet, Factor.getScopes(factors));
             factors = sumProductEliminateVar(factors, var);
             varSet.remove(var);
         }
@@ -57,18 +143,18 @@ public class SumProduct {
     }
 
     public static interface VarOrderStrategy {
-        Var pickVar(ProbabilitySpace space, Set<Var> vars, List<Factor> factors);
+        Var pickVar(ProbabilitySpace space, Set<Var> vars, Iterable<VarSet> factorScopes);
     }
 
     public static abstract class GreedyOrderStrategy implements VarOrderStrategy {
-        public abstract void computeCosts(int[] costs, Set<Var> vars, List<Factor> factors);
+        public abstract void computeCosts(int[] costs, Set<Var> vars, Iterable<VarSet> factorScopes);
 
         @Override
-        public Var pickVar(ProbabilitySpace space, Set<Var> vars, List<Factor> factors) {
+        public Var pickVar(ProbabilitySpace space, Set<Var> vars, Iterable<VarSet> factorScopes) {
             int[] costs = new int[space.getNumVars()];
             Arrays.fill(costs, 1);
 
-            computeCosts(costs, vars, factors);
+            computeCosts(costs, vars, factorScopes);
 
 
             Var minVar = null;
@@ -88,12 +174,11 @@ public class SumProduct {
 
     public static class MinNeighborsStrategy extends GreedyOrderStrategy {
         @Override
-        public void computeCosts(int[] costs, Set<Var> vars, List<Factor> factors) {
+        public void computeCosts(int[] costs, Set<Var> vars, Iterable<VarSet> factorScopes) {
             Multimap<Var, Var> neighbors = HashMultimap.create();
 
-            for (Factor factor : factors) {
-                VarSet scope = factor.getScope();
 
+            for (VarSet scope : factorScopes) {
                 for (Var var : scope) {
                     neighbors.putAll(var, scope);
                 }
@@ -107,9 +192,8 @@ public class SumProduct {
 
     public static class MinWeightStrategy extends GreedyOrderStrategy {
         @Override
-        public void computeCosts(int[] costs, Set<Var> vars, List<Factor> factors) {
-            for (Factor factor : factors) {
-                VarSet scope = factor.getScope();
+        public void computeCosts(int[] costs, Set<Var> vars, Iterable<VarSet> factorScopes) {
+            for (VarSet scope : factorScopes) {
                 int factorCardinality = scope.getCardinality();
 
                 for (Var var : scope) {

@@ -184,7 +184,7 @@ public class FactorTest {
         Factor[] factors = StudentsNetwork.buildStudentsNetwork().getFactors();
         DataGraph<Var, List<Factor>> network = Factor.induceMarkovNetwork(factors);
 
-        assertEquals("DataGraphImpl{isDirected=false, [\n" +
+        assertEquals("DataGraphImpl{isDirected=false, [D, G, I, L, S], [\n" +
                 "    D<->G:[Factor({G, I, D}, [0.3, 0.05, 0.9, 0.5, 0.4, 0.25, 0.08, 0.3, 0.3, 0.7, 0.02, 0.2])]\n" +
                 "    D<->I:[Factor({G, I, D}, [0.3, 0.05, 0.9, 0.5, 0.4, 0.25, 0.08, 0.3, 0.3, 0.7, 0.02, 0.2])]\n" +
                 "    G<->I:[Factor({G, I, D}, [0.3, 0.05, 0.9, 0.5, 0.4, 0.25, 0.08, 0.3, 0.3, 0.7, 0.02, 0.2])]\n" +

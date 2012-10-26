@@ -24,13 +24,13 @@ public class BetheClusterGraphTest {
                 newVarSet(a, b), newVarSet(b, c), newVarSet(a, c)));
 
         assertEquals(
-                "DataGraphImpl{isDirected=false, [\n" +
+                "DataGraphImpl{isDirected=false, [{a, b}, {a, c}, {a}, {b, c}, {b}, {c}], [\n" +
                         "    {a, b}<->{a}:{a}\n" +
                         "    {a, b}<->{b}:{b}\n" +
-                        "    {b, c}<->{b}:{b}\n" +
-                        "    {b, c}<->{c}:{c}\n" +
                         "    {a, c}<->{a}:{a}\n" +
                         "    {a, c}<->{c}:{c}\n" +
+                        "    {b, c}<->{b}:{b}\n" +
+                        "    {b, c}<->{c}:{c}\n" +
                         "]}",
                 graph.toString());
     }
@@ -47,7 +47,7 @@ public class BetheClusterGraphTest {
                 newVarSet(a, b), newVarSet(b, c), newVarSet(c)));
 
         assertEquals(
-                "DataGraphImpl{isDirected=false, [\n" +
+                "DataGraphImpl{isDirected=false, [{a, b}, {a}, {b, c}, {b}, {c}], [\n" +
                         "    {a, b}<->{a}:{a}\n" +
                         "    {a, b}<->{b}:{b}\n" +
                         "    {b, c}<->{b}:{b}\n" +

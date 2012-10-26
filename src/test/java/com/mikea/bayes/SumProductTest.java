@@ -1,5 +1,6 @@
 package com.mikea.bayes;
 
+import com.mikea.bayes.belief.ClusterGraph;
 import org.junit.Test;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -38,5 +39,23 @@ public class SumProductTest {
                         newArrayList(var1, var2, var3),
                         newArrayList(f1, f2, f3),
                         new SumProduct.MinNeighborsStrategy()).toString());
+    }
+
+    @Test
+    public void testCliqueGraph() throws Exception {
+        BayesianNetwork network = StudentsNetwork.buildStudentsNetwork();
+
+        ClusterGraph graph = SumProduct.buildCliqueGraph(network.getVarList(), network.getFactorList());
+
+        assertEquals(
+                "DataGraphImpl{isDirected=false, [{D, G, I}, {D, G}, {D}, {G, L}, {I, S}], [\n" +
+                        "    {D, G, I}<->{D, G}:{D, G}\n" +
+                        "    {D, G}<->{D}:{D}\n" +
+                        "    {G, L}<->{D, G}:{G}\n" +
+                        "    {I, S}<->{D, G, I}:{I}\n" +
+                        "]}",
+                graph.toString()
+        );
+
     }
 }
