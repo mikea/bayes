@@ -87,7 +87,7 @@ public class Factor {
         return Factor.newFactor(productVarSet, values);
     }
 
-    static List<VarSet> getScopes(List<Factor> factors) {
+    public static List<VarSet> getScopes(List<Factor> factors) {
         return transform(factors, new Function<Factor, VarSet>() {
             @Nullable
             @Override
