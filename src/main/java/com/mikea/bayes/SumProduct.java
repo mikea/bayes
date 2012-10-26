@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.mikea.bayes.belief.ClusterGraph;
 import com.mikea.bayes.belief.ClusterGraphImpl;
+import com.mikea.bayes.belief.PruneClusterGraph;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -16,12 +17,13 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Sets.newLinkedHashSet;
 import static com.mikea.bayes.VarSet.newVarSet;
 
 /**
  * @author mike.aizatsky@gmail.com
  */
-public class SumProduct {
+public final class SumProduct {
     public static final VarOrderStrategy DEFAULT_STRATEGY = new MinNeighborsStrategy();
 
     public static Factor sumProductVariableElimination(
@@ -54,7 +56,7 @@ public class SumProduct {
         }));
 
         ClusterGraphImpl.Builder builder = new ClusterGraphImpl.Builder(false);
-        Set<Var> varsToEliminate = newHashSet(vars);
+        Set<Var> varsToEliminate = newLinkedHashSet(vars);
 
         while (!varsToEliminate.isEmpty()) {
             Var var = strategy.pickVar(space, varsToEliminate, Lists.transform(scopes, new Function<VarSetHolder, VarSet>() {
@@ -85,7 +87,7 @@ public class SumProduct {
 
             builder.addNode(clique);
             for (VarSet src : srcs) {
-                builder.addEdge(src, clique, VarSet.interesct(src, clique));
+                builder.addEdge(src, clique, VarSet.intersect(src, clique));
             }
 
             VarSet newScope = clique.removeVars(var);
@@ -94,7 +96,7 @@ public class SumProduct {
             }
         }
 
-        return builder.build();
+        return PruneClusterGraph.prune(builder.build());
     }
 
     private static class VarSetHolder {
@@ -126,7 +128,7 @@ public class SumProduct {
         return Factor.product(factors);
     }
 
-    private static List<Factor> sumProductEliminateVar(List<Factor> factors, Var var) {
+    private static List<Factor> sumProductEliminateVar(Iterable<Factor> factors, Var var) {
         List<Factor> result = newArrayList();
         List<Factor> product = newArrayList();
         for (Factor factor : factors) {
@@ -142,11 +144,11 @@ public class SumProduct {
         return result;
     }
 
-    public static interface VarOrderStrategy {
+    public interface VarOrderStrategy {
         Var pickVar(ProbabilitySpace space, Set<Var> vars, Iterable<VarSet> factorScopes);
     }
 
-    public static abstract class GreedyOrderStrategy implements VarOrderStrategy {
+    public abstract static class GreedyOrderStrategy implements VarOrderStrategy {
         public abstract void computeCosts(int[] costs, Set<Var> vars, Iterable<VarSet> factorScopes);
 
         @Override
@@ -176,7 +178,6 @@ public class SumProduct {
         @Override
         public void computeCosts(int[] costs, Set<Var> vars, Iterable<VarSet> factorScopes) {
             Multimap<Var, Var> neighbors = HashMultimap.create();
-
 
             for (VarSet scope : factorScopes) {
                 for (Var var : scope) {

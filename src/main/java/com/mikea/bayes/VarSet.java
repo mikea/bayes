@@ -7,6 +7,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -20,9 +21,9 @@ public class VarSet implements Iterable<Var> {
     private final Var[] vars;
     private final Set<Var> set;
 
-    private VarSet(Var[] vars) {
+    private VarSet(Var... vars) {
         this.vars = vars;
-        this.set = ImmutableSet.copyOf(vars);
+        set = ImmutableSet.copyOf(vars);
     }
 
     public static VarSet union(Iterable<VarSet> varSets) {
@@ -61,7 +62,7 @@ public class VarSet implements Iterable<Var> {
             result.append(var.toString(showCardinalities));
         }
 
-        result.append("}");
+        result.append('}');
         return result.toString();
     }
 
@@ -88,15 +89,15 @@ public class VarSet implements Iterable<Var> {
     }
 
     int getIndex(VarAssignment assignment) {
-        int index = 0;
-
-        Preconditions.checkArgument(assignment.containsAll(this.vars),
+        Preconditions.checkArgument(assignment.containsAll(vars),
                 "Assignment %s do not match this %s", assignment, this);
 
+        int index = 0;
         for (Var var : vars) {
             int cardinality = var.getCardinality();
             int val = assignment.get(var);
-            Preconditions.checkArgument(val >= 0, "Bad assignment %s@%s for set %s (full assignment: %s)", val, var, this, assignment);
+            Preconditions.checkArgument(val >= 0, "Bad assignment %s@%s for set %s (full assignment: %s)",
+                    val, var, this, assignment);
             index *= cardinality;
             index += val;
         }
@@ -113,7 +114,7 @@ public class VarSet implements Iterable<Var> {
             int cardinality = var.getCardinality();
             int varValue = idx % cardinality;
             values[i] = varValue;
-            idx = idx / cardinality;
+            idx /= cardinality;
         }
 
         return new VarAssignment(vars, values);
@@ -124,7 +125,7 @@ public class VarSet implements Iterable<Var> {
     }
 
     public VarSet removeVars(Var...vars) {
-        return newVarSet(Sets.difference(set, Sets.newHashSet(vars)));
+        return newVarSet(Sets.difference(set, newHashSet(vars)));
     }
 
     @Override
@@ -147,19 +148,19 @@ public class VarSet implements Iterable<Var> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
 
-        if (o instanceof VarSet) {
-            VarSet vars = (VarSet) o;
-            return set.equals(vars.set);
+        if (obj instanceof VarSet) {
+            VarSet other = (VarSet) obj;
+            return set.equals(other.set);
         }
-        if (o instanceof Set) {
-            return set.equals(o);
+        if (obj instanceof Set) {
+            return set.equals(obj);
         }
 
-        throw new IllegalArgumentException(o.getClass().getName());
+        throw new IllegalArgumentException(obj.getClass().getName());
     }
 
     @Override
@@ -180,14 +181,14 @@ public class VarSet implements Iterable<Var> {
     }
 
     public Set<Var> getVarSet() {
-        return set;
+        return Collections.unmodifiableSet(set);
     }
 
     public boolean isEmpty() {
         return set.isEmpty();
     }
 
-    public static VarSet interesct(VarSet...varSets) {
+    public static VarSet intersect(VarSet... varSets) {
         Set<Var> vars = varSets[0].getVarSet();
 
         for (int i = 1; i < varSets.length; i++) {
@@ -195,5 +196,13 @@ public class VarSet implements Iterable<Var> {
             vars = Sets.intersection(vars, varSet.getVarSet());
         }
         return newVarSet(vars);
+    }
+
+    public static VarSet intersect(Iterable<VarSet> varSets) {
+        return intersect(Iterables.toArray(varSets, VarSet.class));
+    }
+
+    public boolean containsAll(VarSet other) {
+        return set.containsAll(other.set);
     }
 }

@@ -55,7 +55,7 @@ public class ProbabilitySpace {
         return checkNotNull(space);
     }
 
-    public int getNumVars() {
+    public synchronized int getNumVars() {
         mutable = false;
         return nextVarIndex;
     }

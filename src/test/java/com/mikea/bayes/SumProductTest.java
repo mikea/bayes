@@ -48,11 +48,9 @@ public class SumProductTest {
         ClusterGraph graph = SumProduct.buildCliqueGraph(network.getVarList(), network.getFactorList());
 
         assertEquals(
-                "DataGraphImpl{isDirected=false, [{D, G, I}, {D, G}, {D}, {G, L}, {I, S}], [\n" +
-                        "    {D, G, I}<->{D, G}:{D, G}\n" +
-                        "    {D, G}<->{D}:{D}\n" +
-                        "    {G, L}<->{D, G}:{G}\n" +
-                        "    {I, S}<->{D, G, I}:{I}\n" +
+                "DataGraphImpl{isDirected=false, [{D, G, I, L}, {G}, {I, S}], [\n" +
+                        "    {D, G, I, L}<->{G}:{G}\n" +
+                        "    {I, S}<->{D, G, I, L}:{I}\n" +
                         "]}",
                 graph.toString()
         );
