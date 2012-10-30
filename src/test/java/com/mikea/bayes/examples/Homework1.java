@@ -2,6 +2,7 @@ package com.mikea.bayes.examples;
 
 import com.mikea.bayes.BayesianNetwork;
 import com.mikea.bayes.DSeparation;
+import com.mikea.bayes.Evidence;
 import com.mikea.bayes.Factor;
 import com.mikea.bayes.ProbabilitySpace;
 import com.mikea.bayes.Var;
@@ -52,9 +53,9 @@ public class Homework1 {
                 .build();
 
         assertEquals("Factor({A}, [0.6521739130434783, 0.3478260869565217])",
-                network.query(newVarSet(A), vars(T), new int[]{1}).toString());
+                network.query(newVarSet(A), new Evidence(vars(T), new int[]{1})).toString());
         assertEquals("Factor({A}, [0.8571428571428572, 0.14285714285714288])",
-                network.query(newVarSet(A), vars(T, P), new int[]{1, 1}).toString());
+                network.query(newVarSet(A), new Evidence(vars(T, P), new int[]{1, 1})).toString());
     }
 
     @Test

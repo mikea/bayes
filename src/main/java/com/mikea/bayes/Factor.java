@@ -1,7 +1,6 @@
 package com.mikea.bayes;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
@@ -170,7 +169,7 @@ public class Factor {
 
     public Factor normalize() {
         double sum = sum();
-        Preconditions.checkState(sum != 0);
+        checkState(sum != 0);
         double[] newValues = new double[values.length];
         for (int i = 0; i < values.length; i++) {
             newValues[i] = values[i] / sum;
@@ -183,6 +182,7 @@ public class Factor {
      * Sum out vars.
      */
     public Factor marginalize(VarSet vars) {
+        if (vars.isEmpty()) return this;
         VarSet newVarSet = scope.removeVars(vars);
         double[] newValues = new double[newVarSet.getCardinality()];
 
@@ -304,6 +304,11 @@ public class Factor {
         }
 
         return graph;
+    }
+
+    public Factor observeEvidence(@Nullable Evidence evidence) {
+        if (evidence == null) return this;
+        return observeEvidence(evidence.getObservedVars(), evidence.getObservedValues());
     }
 
     public static class Builder {

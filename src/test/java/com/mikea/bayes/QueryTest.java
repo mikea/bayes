@@ -65,7 +65,8 @@ public class QueryTest {
 
         assertEquals("Factor({0}, [0.5, 0.5])", network.query(algorithm, vars[0]).toString());
         assertEquals("Factor({0, 1}, [0.25, 0.25, 0.25, 0.25])", network.query(algorithm, vars[0], vars[1]).toString());
-        assertEquals("Factor({0}, [0.5, 0.5])", network.query(algorithm, newVarSet(vars[0]), new Var[] {vars[1]}, new int[] {0}).toString());
+        assertEquals("Factor({0}, [0.5, 0.5])", network.query(algorithm, newVarSet(vars[0]),
+                new Evidence(new Var[] {vars[1]}, new int[] {0})).toString());
     }
 
     @Test

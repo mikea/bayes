@@ -188,6 +188,10 @@ public class VarSet implements Iterable<Var> {
         return set.isEmpty();
     }
 
+    public VarSet intersect(VarSet varSet) {
+        return intersect(this, varSet);
+    }
+
     public static VarSet intersect(VarSet... varSets) {
         Set<Var> vars = varSets[0].getVarSet();
 

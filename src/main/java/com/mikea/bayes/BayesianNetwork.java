@@ -11,6 +11,7 @@ import org.gga.graph.search.dfs.AbstractDfsVisitor;
 import org.gga.graph.util.Pair;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -128,33 +129,40 @@ public class BayesianNetwork {
         return result.build();
     }
 
-    public Factor query(QueryAlgorithm algo, Var[] queryVars, Var[] vars, String[] values) {
+    @Deprecated
+    public Factor query(QueryAlgorithm<?> algo, Var[] queryVars, Var[] vars, String[] values) {
         int[] intValues = new int[values.length];
         for (int i = 0; i < values.length; i++) {
             intValues[i] = vars[i].getValueIndex(values[i]);
         }
 
-        return query(algo, newVarSet(queryVars), vars, intValues);
+        return query(algo, newVarSet(queryVars), new Evidence(vars, intValues));
     }
 
+    @Deprecated
     public Factor query(QueryAlgorithm queryAlgorithm, Var...queryVars) {
         return query(queryAlgorithm, newVarSet(queryVars));
     }
 
+    @Deprecated
     public Factor query(Var...queryVars) {
         return query(QueryAlgorithm.DEFAULT, newVarSet(queryVars));
     }
 
+    @Deprecated
     public Factor query(QueryAlgorithm queryAlgorithm, VarSet query) {
-        return query(queryAlgorithm, query, new Var[]{}, new int[]{});
+        return query(queryAlgorithm, query, null);
     }
 
-    public Factor query(QueryAlgorithm queryAlgorithm, VarSet query, Var[] observedVariables, int[] observedValues) {
-        return queryAlgorithm.query(this, query, observedVariables, observedValues);
+    @Deprecated
+    public Factor query(QueryAlgorithm queryAlgorithm, VarSet query, @Nullable Evidence evidence) {
+        return queryAlgorithm.run(this).query(query, evidence);
 
     }
-    public Factor query(VarSet query, Var[] observedVariables, int[] observedValues) {
-        return query(QueryAlgorithm.DEFAULT, query, observedVariables, observedValues);
+
+    @Deprecated
+    public Factor query(VarSet query, @Nullable Evidence evidence) {
+        return query(QueryAlgorithm.DEFAULT, query, evidence);
     }
 
     @Nonnull

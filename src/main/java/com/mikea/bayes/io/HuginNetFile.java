@@ -273,6 +273,8 @@ public class HuginNetFile {
     }
 
     static class VisitException extends RuntimeException {
+        private static final long serialVersionUID = 6382554085991125362L;
+
         VisitException(String message, Throwable cause) {
             super(message, cause);
         }
