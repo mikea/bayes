@@ -2,6 +2,7 @@ package com.mikea.bayes.belief;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.mikea.bayes.ProbabilitySpace;
 import com.mikea.bayes.Var;
 import com.mikea.bayes.VarSet;
 
@@ -42,7 +43,8 @@ public class BetheClusterGraph {
             }
         }));
 
-        ClusterGraphImpl result = new ClusterGraphImpl(filteredVarSets.size() + individualVarSets.size());
+        ClusterGraphImpl result = new ClusterGraphImpl(
+                ProbabilitySpace.fromVarSets(varSets), filteredVarSets.size() + individualVarSets.size());
 
         // set up vertices.
         {

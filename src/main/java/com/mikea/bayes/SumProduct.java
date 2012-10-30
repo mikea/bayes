@@ -28,7 +28,7 @@ public final class SumProduct {
             Iterable<Var> vars,
             List<Factor> factors,
             VarOrderStrategy strategy) {
-        return sumProductVariableElimination(ProbabilitySpace.get(vars), vars, factors, strategy);
+        return sumProductVariableElimination(ProbabilitySpace.fromVars(vars), vars, factors, strategy);
     }
 
     private static Factor sumProductVariableElimination(ProbabilitySpace space, Iterable<Var> vars, List<Factor> factors, VarOrderStrategy strategy) {

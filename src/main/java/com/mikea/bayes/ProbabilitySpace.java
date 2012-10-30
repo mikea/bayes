@@ -3,6 +3,7 @@ package com.mikea.bayes;
 import com.google.common.base.Objects;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -41,7 +42,7 @@ public class ProbabilitySpace {
         return var;
     }
 
-    public static ProbabilitySpace get(Iterable<Var> vars) {
+    public static ProbabilitySpace fromVars(Iterable<Var> vars) {
         ProbabilitySpace space = null;
 
         for (Var var : vars) {
@@ -55,6 +56,20 @@ public class ProbabilitySpace {
         return checkNotNull(space);
     }
 
+    public static ProbabilitySpace fromVarSets(Iterable<VarSet> varSets) {
+        ProbabilitySpace space = null;
+
+        for (VarSet varSet : varSets) {
+            if (space == null) {
+                space = fromVars(varSet);
+            } else {
+                checkArgument(space == fromVars(varSet));
+            }
+        }
+
+        return checkNotNull(space);
+    }
+
     public synchronized int getNumVars() {
         mutable = false;
         return nextVarIndex;
@@ -62,6 +77,10 @@ public class ProbabilitySpace {
 
     public Var getVar(int index) {
         return vars.get(index);
+    }
+
+    public Iterable<Var> getVariables() {
+        return Collections.unmodifiableList(vars);
     }
 
     @Override

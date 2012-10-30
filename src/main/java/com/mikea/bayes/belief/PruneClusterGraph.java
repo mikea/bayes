@@ -50,7 +50,7 @@ public final class PruneClusterGraph {
             oldToNewNodes.put(oldVarSet, newNodes[v1]);
         }
 
-        return new ClusterGraphImpl(Morph.morph(graph, new Function<VarSet, VarSet>() {
+        return new ClusterGraphImpl(graph.getProbabilitySpace(), Morph.morph(graph, new Function<VarSet, VarSet>() {
                     @Nullable
                     @Override
                     public VarSet apply(@Nullable VarSet input) {

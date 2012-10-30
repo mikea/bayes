@@ -2,6 +2,7 @@ package com.mikea.bayes.belief;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.mikea.bayes.BayesianNetwork;
 import com.mikea.bayes.Factor;
 import com.mikea.bayes.ProbabilitySpace;
 import com.mikea.bayes.SumProduct;
@@ -23,13 +24,19 @@ import static com.mikea.bayes.VarSet.newVarSet;
  */
 public final class CliqueTree {
     public static ClusterGraph buildCliqueTree(
+            BayesianNetwork network) {
+        return buildCliqueTree(network.getVarList(), network.getFactorList());
+    }
+
+
+    public static ClusterGraph buildCliqueTree(
             Iterable<Var> vars,
             List<Factor> factors) {
         return buildCliqueTree(vars, factors, SumProduct.DEFAULT_STRATEGY);
     }
 
     private static ClusterGraph buildCliqueTree(Iterable<Var> vars, List<Factor> factors, SumProduct.VarOrderStrategy strategy) {
-        ProbabilitySpace space = ProbabilitySpace.get(vars);
+        ProbabilitySpace space = ProbabilitySpace.fromVars(vars);
         List<VarSetHolder> scopes = newArrayList(Lists.transform(newArrayList(Factor.getScopes(factors)), new Function<VarSet, VarSetHolder>() {
             @Nullable
             @Override
@@ -38,7 +45,7 @@ public final class CliqueTree {
             }
         }));
 
-        ClusterGraphImpl.Builder builder = new ClusterGraphImpl.Builder(false);
+        ClusterGraphImpl.Builder builder = new ClusterGraphImpl.Builder(space, false);
         Set<Var> varsToEliminate = newLinkedHashSet(vars);
 
         while (!varsToEliminate.isEmpty()) {
