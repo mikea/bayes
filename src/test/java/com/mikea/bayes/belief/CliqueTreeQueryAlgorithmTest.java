@@ -30,7 +30,7 @@ public class CliqueTreeQueryAlgorithmTest {
         for (Var var : network.getVarList()) {
             Factor expected = baselineResult.query(newVarSet(var));
             Factor actual = actualResult.query(newVarSet(var));
-            assertEquals(expected, actual);
+            assertEquals(expected.toString("%.4f"), actual.toString("%.4f"));
 
             double baselineProbability = baselineResult.getProbability(new Evidence(new Var[]{var}, new int[]{0}));
             double actualProbability = actualResult.getProbability(new Evidence(new Var[]{var}, new int[]{0}));

@@ -311,6 +311,12 @@ public class Factor {
         return observeEvidence(evidence.getObservedVars(), evidence.getObservedValues());
     }
 
+    public static Factor constant(VarSet node, double v) {
+        double[] values = new double[node.getCardinality()];
+        Arrays.fill(values, v);
+        return new Factor(node, values);
+    }
+
     public static class Builder {
         private VarSet varSet;
         private double[] values;

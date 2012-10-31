@@ -1,5 +1,7 @@
 package com.mikea.bayes.belief;
 
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.Lists;
 import com.mikea.bayes.BayesianNetwork;
 import com.mikea.bayes.Evidence;
 import com.mikea.bayes.Factor;
@@ -8,38 +10,40 @@ import com.mikea.bayes.query.QueryAlgorithm;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.gga.graph.Edge;
+import org.gga.graph.Graph;
+import org.gga.graph.Graphs;
 import org.gga.graph.impl.EdgeMapImpl;
 import org.gga.graph.maps.EdgeMap;
+import org.gga.graph.search.dfs.AbstractDfsVisitor;
+import org.gga.graph.tree.Trees;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * @author mike.aizatsky@gmail.com
  */
-public class BeliefPropagationAlgorithm implements QueryAlgorithm<BeliefPropagationAlgorithm.BPResult> {
-    private final int iterations;
+public abstract class BeliefPropagationAlgorithm implements QueryAlgorithm<BeliefPropagationAlgorithm.BPResult> {
+    protected final int iterations;
 
-    public BeliefPropagationAlgorithm(int iterations) {
+    protected BeliefPropagationAlgorithm(int iterations) {
         this.iterations = iterations;
     }
 
     @Override
-    public BPResult run(BayesianNetwork network) {
-        return new BPResult(iterations);
-    }
+    public abstract BPResult run(BayesianNetwork network);
 
     public static class BPResult extends QueryAlgorithm.Result {
         private final int iterations;
         private final Factor[] factors;
-        private final ClusterGraphImpl clusterGraph;
+        private final ClusterGraph clusterGraph;
         private EdgeMap<Factor> messages1;
         private EdgeMap<Factor> messages2;
         private TIntObjectMap<Factor> potentials;
@@ -49,7 +53,7 @@ public class BeliefPropagationAlgorithm implements QueryAlgorithm<BeliefPropagat
             throw new UnsupportedOperationException();
         }
 
-        public BPResult(Factor[] factors, ClusterGraphImpl clusterGraph, int iterations) {
+        public BPResult(Factor[] factors, ClusterGraph clusterGraph, int iterations) {
             this.factors = factors;
             this.clusterGraph = clusterGraph;
             this.iterations = iterations;
@@ -61,6 +65,97 @@ public class BeliefPropagationAlgorithm implements QueryAlgorithm<BeliefPropagat
             messages2 = new EdgeMapImpl<Factor>();
             potentials = new TIntObjectHashMap<Factor>();
 
+            assignFactorsToClusters();
+
+            Set<Edge> edges = Graphs.getAllEdges(clusterGraph.getIntGraph());
+
+            // Message loop
+            passMessages(edges);
+
+            // Compute final potentials.
+            computeFinalPotentials(edges);
+        }
+
+        private void passMessages(Iterable<Edge> edges) {
+            Iterator<MessageDirection> i = getDirectionIterator(edges);
+            while (i.hasNext()) {
+                MessageDirection direction = i.next();
+                sendMessage(direction.from, direction.to, direction.edge);
+            }
+        }
+
+        private Iterator<MessageDirection> getDirectionIterator(Iterable<Edge> edges) {
+            if (Trees.isTree(clusterGraph.getIntGraph())) {
+                return getTreeIterator();
+            } else {
+                return getRandomEdgeOrderIterator(edges);
+            }
+        }
+
+        private Iterator<MessageDirection> getTreeIterator() {
+            final List<Edge> edgesInOrder = newArrayList();
+            clusterGraph.getIntGraph().getDfs().depthFirstSearch(new AbstractDfsVisitor() {
+                @Override
+                public void treeEdge(Edge e, Graph graph) {
+                    edgesInOrder.add(e);
+                }
+
+                @Override
+                public void backEdge(Edge e, Graph graph) {
+                    throw new IllegalStateException();
+                }
+            });
+
+            List<MessageDirection> result = newArrayList();
+            for (Edge edge : Lists.reverse(edgesInOrder)) {
+                result.add(new MessageDirection(edge.w(), edge.v(), edge));
+            }
+            for (Edge edge : edgesInOrder) {
+                result.add(new MessageDirection(edge.v(), edge.w(), edge));
+            }
+            return result.iterator();
+        }
+
+        private Iterator<MessageDirection> getRandomEdgeOrderIterator(Iterable<Edge> edges) {
+            final List<Edge> edgeList = newArrayList(edges);
+
+            return new AbstractIterator<MessageDirection>() {
+                private boolean direction = false;
+                private int iteration = 0;
+                private  Iterator<Edge> i = null;
+                @Override
+                protected MessageDirection computeNext() {
+                    if (i == null || !i.hasNext()) {
+                        if (iteration > iterations * 2) {
+                            endOfData();
+                        }
+                        direction = !direction;
+                        if (direction) {
+                            Collections.shuffle(edgeList);
+                            i = edgeList.iterator();
+                        } else {
+                            i = Lists.reverse(edgeList).iterator();
+                        }
+                        ++iteration;
+                    }
+
+                    Edge edge = i.next();
+                    int from = direction ? edge.v() : edge.w();
+                    int to = direction ? edge.w() : edge.v();
+
+                    return new MessageDirection(from, to, edge);
+                }
+            };
+        }
+
+        private void computeFinalPotentials(Iterable<Edge> edges) {
+            for (Edge edge : edges) {
+                incorporateMessage(edge.v(), edge.w(), edge);
+                incorporateMessage(edge.w(), edge.v(), edge);
+            }
+        }
+
+        private void assignFactorsToClusters() {
             nextFactor: for (Factor factor : factors) {
                 for (int i = 0; i < clusterGraph.V(); ++i) {
                     if (clusterGraph.getNode(i).containsAll(factor.getScope())) {
@@ -77,35 +172,9 @@ public class BeliefPropagationAlgorithm implements QueryAlgorithm<BeliefPropagat
                 throw new IllegalStateException();
             }
 
-            Set<Edge> edges = newHashSet();
             for (int i = 0; i < clusterGraph.V(); ++i) {
-                for (Edge edge : clusterGraph.getIntGraph().getEdges(i)) {
-                    edges.add(edge);
-                }
-            }
-
-            // Message loop
-            List<Edge> edgeList = newArrayList(edges);
-            for (int iteration = 0; iteration < iterations; ++iteration) {
-                Collections.shuffle(edgeList);
-
-                // Forward messages
-                for (int i = 0; i < edgeList.size(); i++) {
-                    Edge edge = edgeList.get(i);
-                    sendMessage(edge.v(), edge.w(), edge);
-                }
-
-                // Backward messages
-                for (int i = edgeList.size() - 1; i >= 0; i--) {
-                    Edge edge = edgeList.get(i);
-                    sendMessage(edge.w(), edge.v(), edge);
-                }
-            }
-
-            // Compute final potentials.
-            for (Edge edge : edgeList) {
-                incorporateMessage(edge.v(), edge.w(), edge);
-                incorporateMessage(edge.w(), edge.v(), edge);
+                if (potentials.containsKey(i)) continue;
+                potentials.put(i, Factor.constant(clusterGraph.getNode(i), 1));
             }
         }
 
@@ -162,6 +231,18 @@ public class BeliefPropagationAlgorithm implements QueryAlgorithm<BeliefPropagat
             }
 
             throw new UnsupportedOperationException("No cluster node covering evidence. Not implemented.");
+        }
+    }
+
+    private static class MessageDirection {
+        private final int from;
+        private final int to;
+        private final Edge edge;
+
+        private MessageDirection(int from, int to, Edge edge) {
+            this.from = from;
+            this.to = to;
+            this.edge = edge;
         }
     }
 }

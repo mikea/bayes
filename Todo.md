@@ -8,6 +8,14 @@ Sum Product:
 * performance
 
 Belief Propagation:
-* Cluster graph validation
-* Belief Propagation
+* more clique tree algorithms
+
+MAP:
+* naive
+* BP
+
+Dual Decomposition
+
+Analyze other libraries
+
 
