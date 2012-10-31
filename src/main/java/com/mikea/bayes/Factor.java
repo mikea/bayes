@@ -265,6 +265,16 @@ public class Factor {
         return new Factor(scope, newValues);
     }
 
+    public boolean equals(Factor other, double epsilon) {
+        if (!scope.equals(other.scope)) return false;
+
+        for (int i = 0; i < values.length; ++i) {
+            if (Math.abs(values[i] - other.values[i]) > epsilon) return false;
+        }
+
+        return true;
+    }
+
     public static DataGraph<Var, List<Factor>> induceMarkovNetwork(Factor... factors) {
         VarSet vars = VarSet.union(Iterables.transform(Arrays.asList(factors), new Function<Factor, VarSet>() {
             @Nullable

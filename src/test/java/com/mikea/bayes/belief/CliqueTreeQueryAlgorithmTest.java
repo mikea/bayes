@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import static com.mikea.bayes.VarSet.newVarSet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author mike.aizatsky@gmail.com
@@ -26,15 +27,16 @@ public class CliqueTreeQueryAlgorithmTest {
 
         QueryAlgorithm.Result baselineResult = baselineAlgorithm.run(network);
         QueryAlgorithm.Result actualResult = algorithm.run(network);
+        double epsilon = 0.001;
 
         for (Var var : network.getVarList()) {
             Factor expected = baselineResult.query(newVarSet(var));
             Factor actual = actualResult.query(newVarSet(var));
-            assertEquals(expected.toString("%.4f"), actual.toString("%.4f"));
+            assertTrue(expected.equals(actual, epsilon));
 
             double baselineProbability = baselineResult.getProbability(new Evidence(new Var[]{var}, new int[]{0}));
             double actualProbability = actualResult.getProbability(new Evidence(new Var[]{var}, new int[]{0}));
-            assertEquals(baselineProbability, actualProbability, 0.001);
+            assertEquals(baselineProbability, actualProbability, epsilon);
         }
     }
 }
