@@ -32,12 +32,17 @@ public final class CliqueTree {
     public static ClusterGraph buildCliqueTree(
             Iterable<Var> vars,
             List<Factor> factors) {
-        return buildCliqueTree(vars, factors, SumProduct.DEFAULT_STRATEGY);
+        return buildCliqueTreeFromFactors(vars, factors, SumProduct.DEFAULT_STRATEGY);
     }
 
-    private static ClusterGraph buildCliqueTree(Iterable<Var> vars, List<Factor> factors, SumProduct.VarOrderStrategy strategy) {
+    private static ClusterGraph buildCliqueTreeFromFactors(Iterable<Var> vars, List<Factor> factors, SumProduct.VarOrderStrategy strategy) {
+        List<VarSet> factorScopes = Factor.getScopes(factors);
+        return buildCliqueTree(vars, factorScopes, strategy);
+    }
+
+    public static ClusterGraph buildCliqueTree(Iterable<Var> vars, Iterable<VarSet> factorScopes, SumProduct.VarOrderStrategy strategy) {
         ProbabilitySpace space = ProbabilitySpace.fromVars(vars);
-        List<VarSetHolder> scopes = newArrayList(Lists.transform(newArrayList(Factor.getScopes(factors)), new Function<VarSet, VarSetHolder>() {
+        List<VarSetHolder> scopes = newArrayList(Lists.transform(newArrayList(factorScopes), new Function<VarSet, VarSetHolder>() {
             @Nullable
             @Override
             public VarSetHolder apply(@Nullable VarSet input) {

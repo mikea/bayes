@@ -16,6 +16,7 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.Tree;
 
 import javax.annotation.Nullable;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -30,6 +31,16 @@ import static java.util.Arrays.asList;
  * @author mike.aizatsky@gmail.com
  */
 public class HuginNetFile {
+    public static BayesianNetwork loadNetFile(String fileName) throws IOException {
+        FileInputStream ios = new FileInputStream(fileName);
+
+        try {
+            return loadNetFile(ios);
+        } finally {
+            ios.close();
+        }
+    }
+
     public static BayesianNetwork loadNetFile(InputStream stream) throws IOException {
         final ProbabilitySpace space = new ProbabilitySpace();  // todo: name after file.
 

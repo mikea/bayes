@@ -9,8 +9,10 @@ import org.gga.graph.transform.Morph;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * @author mike.aizatsky@gmail.com
@@ -19,6 +21,8 @@ public final class PruneClusterGraph {
     public static ClusterGraph prune(ClusterGraph graph) {
         WeightedUnionFind unionFind = new WeightedUnionFind(graph.V());
 
+        Set<VarSet> prunedNodes = newHashSet();
+
         for (int v = 0; v < graph.V(); ++v) {
             for (Edge edge : graph.getIntGraph().getEdges(v)) {
                 int w = edge.other(v);
@@ -26,8 +30,12 @@ public final class PruneClusterGraph {
                 VarSet vSet = graph.getNode(v);
                 VarSet wSet = graph.getNode(w);
 
-                if (vSet.containsAll(wSet) || wSet.containsAll(vSet)) {
+                if (vSet.containsAll(wSet) && !prunedNodes.contains(wSet)) {
                     unionFind.union(v, w);
+                    prunedNodes.add(wSet);
+                } else if (wSet.containsAll(vSet) && !prunedNodes.contains(vSet)) {
+                    unionFind.union(v, w);
+                    prunedNodes.add(vSet);
                 }
             }
         }
