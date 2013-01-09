@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Sets.newHashSet;
 
 /**
@@ -73,11 +74,12 @@ public class VarSet implements Iterable<Var> {
     }
 
     public int getCardinality() {
-        int result = 1;
+        long result = 1;
         for (Var var : this) {
             result *= var.getCardinality();
         }
-        return result;
+        checkState(result < Integer.MAX_VALUE);
+        return (int) result;
     }
 
     /**
@@ -169,7 +171,7 @@ public class VarSet implements Iterable<Var> {
     }
 
     public Iterable<VarAssignment> assignments() {
-        VarAssignment[] assignments = new VarAssignment[getCardinality()];
+        VarAssignment[] assignments = new VarAssignment[(int) getCardinality()];
         for (int i = 0; i < assignments.length; i++) {
             assignments[i] = getAssignment(i);
         }

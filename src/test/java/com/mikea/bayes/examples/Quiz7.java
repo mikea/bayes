@@ -2,10 +2,10 @@ package com.mikea.bayes.examples;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.mikea.bayes.Evidence;
 import com.mikea.bayes.Factor;
 import com.mikea.bayes.ProbabilitySpace;
 import com.mikea.bayes.Var;
+import com.mikea.bayes.VarAssignment;
 import com.mikea.bayes.VarSet;
 import com.mikea.bayes.belief.BeliefPropagationAlgorithm;
 import com.mikea.bayes.belief.ClusterGraphImpl;
@@ -85,7 +85,7 @@ public class Quiz7 {
         BeliefPropagationAlgorithm.BPResult result = new BeliefPropagationAlgorithm.BPResult(
                 Iterables.toArray(factors, Factor.class), clusterGraph, 100);
 
-        double probability = result.getProbability(new Evidence(new Var[]{x4, x5}, new int[]{1, 1}));
+        double probability = result.getProbability(new VarAssignment(new Var[]{x4, x5}, new int[]{1, 1}));
         assertEquals(0.4545, probability, 0.01);
     }
 }

@@ -1,3 +1,8 @@
+Forward Sampling:
+* forward sampling with evidence
+* forward sampling based querying
+* forward sampling performance test
+
 Implement:
 
 * DSeparation for all pairs is suboptimal
@@ -33,3 +38,16 @@ Dual Decomposition
 * Gibbs sampler;
 * Conditioned Belief Propagation [EaG09];
 * Decimation algorithm.
+
+== Data Sets ==
+* http://melodi.ee.washington.edu/~bilmes/uai06InferenceEvaluation/
+* http://graphmod.ics.uci.edu/uai08
+* UAI Approximate Inference Competition - http://www.cs.huji.ac.il/project/UAI10/
+* The Probabilistic Inference Challenge (PIC2011) - http://www.cs.huji.ac.il/project/PASCAL/
+* http://researchers.lille.inria.fr/~freno/datasets.html
+
+
+== OSS Implementations ==
+* libDAI - C++ - http://cs.ru.nl/~jorism/libDAI/
+* The Graphical Models Toolkit (GMTK) - http://ssli.ee.washington.edu/~bilmes/gmtk/
+*  JProGraM - PRObabilistic GRAphical Models in Java - http://researchers.lille.inria.fr/~freno/JProGraM.html

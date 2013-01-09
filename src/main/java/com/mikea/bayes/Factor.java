@@ -316,9 +316,9 @@ public class Factor {
         return graph;
     }
 
-    public Factor observeEvidence(@Nullable Evidence evidence) {
+    public Factor observeEvidence(@Nullable VarAssignment evidence) {
         if (evidence == null) return this;
-        return observeEvidence(evidence.getObservedVars(), evidence.getObservedValues());
+        return observeEvidence(evidence.getVars(), evidence.getValues());
     }
 
     public static Factor constant(VarSet node, double v) {

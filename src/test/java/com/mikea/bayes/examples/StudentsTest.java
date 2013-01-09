@@ -1,8 +1,8 @@
 package com.mikea.bayes.examples;
 
 import com.mikea.bayes.BayesianNetwork;
-import com.mikea.bayes.Evidence;
 import com.mikea.bayes.Factor;
+import com.mikea.bayes.VarAssignment;
 import org.junit.Test;
 
 import static com.mikea.bayes.Var.vars;
@@ -55,12 +55,12 @@ public class StudentsTest {
         // Compute P(L|i0)
         assertEquals(
                 "Factor({L}, [0.6114, 0.3886])",
-                n.query(newVarSet(L), new Evidence(vars(I), ints(0))).toString("%.4f"));
+                n.query(newVarSet(L), new VarAssignment(vars(I), ints(0))).toString("%.4f"));
 
         // Compute P(L|i0, d0)
         assertEquals(
                 "Factor({L}, [0.4870, 0.5130])",
-                n.query(newVarSet(L), new Evidence(vars(I, D), ints(0, 0))).toString("%.4f"));
+                n.query(newVarSet(L), new VarAssignment(vars(I, D), ints(0, 0))).toString("%.4f"));
 
         // Compute P(I)
         assertEquals(
@@ -70,21 +70,21 @@ public class StudentsTest {
         // Compute P(I|g3), P(D|g3)
         assertEquals(
                 "Factor({I}, [0.9211, 0.0789])",
-                n.query(newVarSet(I), new Evidence(vars(G), new int[]{2})).toString("%.4f"));
+                n.query(newVarSet(I), new VarAssignment(vars(G), new int[]{2})).toString("%.4f"));
         assertEquals(
                 "Factor({D}, [0.3707, 0.6293])",
-                n.query(newVarSet(D), new Evidence(vars(G), new int[]{2})).toString("%.4f"));
+                n.query(newVarSet(D), new VarAssignment(vars(G), new int[]{2})).toString("%.4f"));
 
         // Compute P(I|l0), P(I|g3, l0), P(I|g3, s1)
         assertEquals(
                 "Factor({I}, [0.8600, 0.1400])",
-                n.query(newVarSet(I), new Evidence(vars(L), new int[]{0})).toString("%.4f"));
+                n.query(newVarSet(I), new VarAssignment(vars(L), new int[]{0})).toString("%.4f"));
         assertEquals(
                 "Factor({I}, [0.9211, 0.0789])",
-                n.query(newVarSet(I), new Evidence(vars(G, L), new int[]{2, 0})).toString("%.4f"));
+                n.query(newVarSet(I), new VarAssignment(vars(G, L), new int[]{2, 0})).toString("%.4f"));
         assertEquals(
                 "Factor({I}, [0.4217, 0.5783])",
-                n.query(newVarSet(I), new Evidence(vars(G, S), new int[]{2, 1})).toString("%.4f"));
+                n.query(newVarSet(I), new VarAssignment(vars(G, S), new int[]{2, 1})).toString("%.4f"));
     }
 
     private static int[] ints(int...values) {

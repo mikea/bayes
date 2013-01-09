@@ -3,8 +3,8 @@ package com.mikea.bayes.belief;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Lists;
 import com.mikea.bayes.BayesianNetwork;
-import com.mikea.bayes.Evidence;
 import com.mikea.bayes.Factor;
+import com.mikea.bayes.VarAssignment;
 import com.mikea.bayes.VarSet;
 import com.mikea.bayes.query.QueryAlgorithm;
 import gnu.trove.map.TIntObjectMap;
@@ -217,7 +217,7 @@ public abstract class BeliefPropagationAlgorithm implements QueryAlgorithm<Belie
 
 
         @Override
-        public Factor query(VarSet query, @Nullable Evidence evidence) {
+        public Factor query(VarSet query, @Nullable VarAssignment evidence) {
             checkArgument(evidence == null, "Not implemented");
 
             for (int i = 0; i < clusterGraph.V(); ++i) {

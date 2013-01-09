@@ -1,10 +1,10 @@
 package com.mikea.bayes.belief;
 
 import com.mikea.bayes.BayesianNetwork;
-import com.mikea.bayes.Evidence;
 import com.mikea.bayes.Factor;
 import com.mikea.bayes.SumProduct;
 import com.mikea.bayes.Var;
+import com.mikea.bayes.VarAssignment;
 import com.mikea.bayes.data.StudentsNetwork;
 import com.mikea.bayes.query.QueryAlgorithm;
 import com.mikea.bayes.query.VarElimination;
@@ -34,8 +34,8 @@ public class CliqueTreeQueryAlgorithmTest {
             Factor actual = actualResult.query(newVarSet(var));
             assertTrue(expected.equals(actual, epsilon));
 
-            double baselineProbability = baselineResult.getProbability(new Evidence(new Var[]{var}, new int[]{0}));
-            double actualProbability = actualResult.getProbability(new Evidence(new Var[]{var}, new int[]{0}));
+            double baselineProbability = baselineResult.getProbability(new VarAssignment(new Var[]{var}, new int[]{0}));
+            double actualProbability = actualResult.getProbability(new VarAssignment(new Var[]{var}, new int[]{0}));
             assertEquals(baselineProbability, actualProbability, epsilon);
         }
     }

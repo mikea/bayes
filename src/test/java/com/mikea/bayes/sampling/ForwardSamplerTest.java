@@ -1,7 +1,6 @@
 package com.mikea.bayes.sampling;
 
 import com.mikea.bayes.BayesianNetwork;
-import com.mikea.bayes.Evidence;
 import com.mikea.bayes.Var;
 import com.mikea.bayes.VarAssignment;
 import com.mikea.bayes.data.StudentsNetwork;
@@ -43,7 +42,7 @@ public class ForwardSamplerTest {
 
             for (int j = 0; j < varCounts.length; j++) {
                 double p = (double) varCounts[j] / sum;
-                double expectedProb = queryResult.getProbability(new Evidence(new Var[]{var}, new int[]{j}));
+                double expectedProb = queryResult.getProbability(new VarAssignment(new Var[]{var}, new int[]{j}));
                 assertEquals(expectedProb, p, 1e-2);
             }
 

@@ -1,0 +1,51 @@
+<xbif version="0.3a">
+  <network>
+    <name>Simple network</name>
+
+    <!-- Variables -->
+    <variable type="discrete">
+      <name>node_A</name>
+      <values>3</values>
+      <observed>1</observed>
+    </variable>
+
+    <variable type="discrete">
+      <name>node_B</name>
+      <values>2</values>
+    </variable>
+
+    <variable type="discrete">
+      <name>node_C</name>
+      <values>3</values>
+    </variable>
+
+    <!-- Probabilities -->
+    <probability>
+      <for>node_A</for>
+      <table>
+      	  0.2 0.3 0.5
+      </table>
+    </probability>
+
+    <probability>
+      <for>node_B</for>
+      <table>
+      	  0.3 0.7
+      </table>
+    </probability>
+
+    <probability>
+      <for>node_C</for>
+      <given>node_A</given>
+      <given>node_B</given>
+      <table>
+      	  0.2 0.3 0.5
+      	  0.3 0.4 0.3
+      	  0.1 0.8 0.1
+      	  0.2 0.4 0.4
+      	  0.4 0.5 0.1
+      	  0.3 0.3 0.4
+      </table>
+    </probability>
+  </network>
+</xbif>

@@ -2,10 +2,10 @@ package com.mikea.bayes.query;
 
 import com.google.common.collect.Sets;
 import com.mikea.bayes.BayesianNetwork;
-import com.mikea.bayes.Evidence;
 import com.mikea.bayes.Factor;
 import com.mikea.bayes.SumProduct;
 import com.mikea.bayes.Var;
+import com.mikea.bayes.VarAssignment;
 import com.mikea.bayes.VarSet;
 
 import javax.annotation.Nullable;
@@ -29,13 +29,13 @@ public class VarElimination implements QueryAlgorithm<QueryAlgorithm.Result> {
     public Result prepare(final BayesianNetwork network) {
         return new Result() {
             @Override
-            public Factor query(VarSet query, @Nullable Evidence evidence) {
+            public Factor query(VarSet query, @Nullable VarAssignment evidence) {
                 return queryImpl(network, query, evidence);
             }
         };
     }
 
-    private Factor queryImpl(BayesianNetwork network, VarSet query, @Nullable Evidence evidence) {
+    private Factor queryImpl(BayesianNetwork network, VarSet query, @Nullable VarAssignment evidence) {
         List<Factor> factors = newArrayList();
         for (Factor factor : network.getFactors()) {
             factors.add(factor.observeEvidence(evidence));
@@ -43,6 +43,5 @@ public class VarElimination implements QueryAlgorithm<QueryAlgorithm.Result> {
 
         Sets.SetView<Var> varsToEliminate = Sets.difference(network.getVarSet(), query.getVarSet());
         return sumProductVariableElimination(varsToEliminate, factors, strategy).normalize();
-
     }
 }

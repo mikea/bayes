@@ -96,6 +96,14 @@ public class VarAssignment implements Iterable<Var> {
         return set(var, var.getValueIndex(value));
     }
 
+    public Var[] getVars() {
+        return vars;
+    }
+
+    public int[] getValues() {
+        return values;
+    }
+
     public static class Builder {
         private final List<Var> vars = newArrayList();
         private final List<Integer> values = newArrayList();

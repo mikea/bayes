@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.mikea.bayes.VarSet.newVarSet;
@@ -34,6 +35,7 @@ public final class SumProduct {
     private static Factor sumProductVariableElimination(ProbabilitySpace space, Iterable<Var> vars, List<Factor> factors, VarOrderStrategy strategy) {
         Set<Var> varSet = newHashSet(vars);
         while (!varSet.isEmpty()) {
+            System.out.println("varSet.size() = " + varSet.size());
             Var var = strategy.pickVar(space, varSet, Factor.getScopes(factors));
             factors = sumProductEliminateVar(factors, var);
             varSet.remove(var);
@@ -63,26 +65,30 @@ public final class SumProduct {
     }
 
     public abstract static class GreedyOrderStrategy implements VarOrderStrategy {
-        public abstract void computeCosts(int[] costs, Set<Var> vars, Iterable<VarSet> factorScopes);
+        public abstract void computeCosts(long[] costs, Set<Var> vars, Iterable<VarSet> factorScopes);
 
         @Override
         public Var pickVar(ProbabilitySpace space, Set<Var> vars, Iterable<VarSet> factorScopes) {
-            int[] costs = new int[space.getNumVars()];
+            long[] costs = new long[space.getNumVars()];
             Arrays.fill(costs, 1);
 
             computeCosts(costs, vars, factorScopes);
 
+            System.out.println("Arrays.toString(costs) = " + Arrays.toString(costs));
 
             Var minVar = null;
-            int minCost = Integer.MAX_VALUE;
+            long minCost = Long.MAX_VALUE;
 
             for (Var var : vars) {
-                int cost = costs[var.getIndex()];
+                long cost = costs[var.getIndex()];
+                if (cost < 0) cost = Long.MAX_VALUE;
                 if (cost < minCost) {
                     minCost = cost;
                     minVar = var;
                 }
             }
+            System.out.println("minCost = " + minCost);
+            System.out.println("minVar = " + minVar);
 
             return checkNotNull(minVar);
         }
@@ -90,7 +96,7 @@ public final class SumProduct {
 
     public static class MinNeighborsStrategy extends GreedyOrderStrategy {
         @Override
-        public void computeCosts(int[] costs, Set<Var> vars, Iterable<VarSet> factorScopes) {
+        public void computeCosts(long[] costs, Set<Var> vars, Iterable<VarSet> factorScopes) {
             Multimap<Var, Var> neighbors = HashMultimap.create();
 
             for (VarSet scope : factorScopes) {
@@ -107,9 +113,10 @@ public final class SumProduct {
 
     public static class MinWeightStrategy extends GreedyOrderStrategy {
         @Override
-        public void computeCosts(int[] costs, Set<Var> vars, Iterable<VarSet> factorScopes) {
+        public void computeCosts(long[] costs, Set<Var> vars, Iterable<VarSet> factorScopes) {
             for (VarSet scope : factorScopes) {
                 int factorCardinality = scope.getCardinality();
+                checkState(factorCardinality != 0, "Zero cardinality factor: %s", scope);
 
                 for (Var var : scope) {
                     costs[var.getIndex()] *= factorCardinality;

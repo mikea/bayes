@@ -140,7 +140,7 @@ public class BayesianNetwork {
             intValues[i] = vars[i].getValueIndex(values[i]);
         }
 
-        return query(algo, newVarSet(queryVars), new Evidence(vars, intValues));
+        return query(algo, newVarSet(queryVars), new VarAssignment(vars, intValues));
     }
 
     @Deprecated
@@ -159,13 +159,13 @@ public class BayesianNetwork {
     }
 
     @Deprecated
-    public Factor query(QueryAlgorithm queryAlgorithm, VarSet query, @Nullable Evidence evidence) {
+    public Factor query(QueryAlgorithm queryAlgorithm, VarSet query, @Nullable VarAssignment evidence) {
         return queryAlgorithm.prepare(this).query(query, evidence);
 
     }
 
     @Deprecated
-    public Factor query(VarSet query, @Nullable Evidence evidence) {
+    public Factor query(VarSet query, @Nullable VarAssignment evidence) {
         return query(QueryAlgorithm.DEFAULT, query, evidence);
     }
 
@@ -196,29 +196,34 @@ public class BayesianNetwork {
     }
 
     public static class Builder {
-        private Var[] vars;
+        private List<Var> vars = newArrayList();
         private final List<Pair<Var, Var>> edges = newArrayList();
         private final Map<Var, Factor> factors = newHashMap();
 
-        public Builder withVariables(Var[] vars) {
-            this.vars = vars;
+        private Builder withVariables(Var[] vars) {
+            this.vars = newArrayList(vars);
+            return this;
+        }
+
+        public Builder addVariable(Var var) {
+            vars.add(var);
             return this;
         }
 
         public BayesianNetwork build() {
-            DataGraphImpl<Var, Void> g = new DataGraphImpl<Var, Void>(Var.class, vars.length, true);
-            for (int i = 0; i < vars.length; i++) {
-                g.setNode(i, vars[i]);
+            int size = vars.size();
+            DataGraphImpl<Var, Void> g = new DataGraphImpl<Var, Void>(Var.class, size, true);
+            for (int i = 0; i < size; i++) {
+                g.setNode(i, vars.get(i));
             }
 
             for (Pair<Var, Var> edge : edges) {
                 g.insert(edge.first, edge.second, null);
             }
 
-            Factor[] factorArray = new Factor[vars.length];
-            for (int i = 0; i < vars.length; i++) {
-                Var var = vars[i];
-                factorArray[i] = factors.get(var);
+            Factor[] factorArray = new Factor[size];
+            for (int i = 0; i < size; i++) {
+                factorArray[i] = factors.get(vars.get(i));
             }
 
             return new BayesianNetwork(g, factorArray);
