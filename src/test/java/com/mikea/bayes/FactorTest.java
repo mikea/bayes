@@ -1,5 +1,6 @@
 package com.mikea.bayes;
 
+import com.mikea.bayes.data.StudentsNetwork;
 import org.gga.graph.maps.DataGraph;
 import org.junit.Test;
 

@@ -5,15 +5,15 @@ import com.mikea.bayes.Evidence;
 import com.mikea.bayes.Factor;
 import org.junit.Test;
 
-import static com.mikea.bayes.StudentsNetwork.D;
-import static com.mikea.bayes.StudentsNetwork.G;
-import static com.mikea.bayes.StudentsNetwork.I;
-import static com.mikea.bayes.StudentsNetwork.L;
-import static com.mikea.bayes.StudentsNetwork.S;
-import static com.mikea.bayes.StudentsNetwork.buildStudentsNetwork;
 import static com.mikea.bayes.Var.vars;
 import static com.mikea.bayes.VarAssignment.at;
 import static com.mikea.bayes.VarSet.newVarSet;
+import static com.mikea.bayes.data.StudentsNetwork.D;
+import static com.mikea.bayes.data.StudentsNetwork.G;
+import static com.mikea.bayes.data.StudentsNetwork.I;
+import static com.mikea.bayes.data.StudentsNetwork.L;
+import static com.mikea.bayes.data.StudentsNetwork.S;
+import static com.mikea.bayes.data.StudentsNetwork.buildStudentsNetwork;
 import static org.junit.Assert.assertEquals;
 
 /**

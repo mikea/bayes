@@ -43,10 +43,10 @@ public class BayesianNetwork {
 
     public void validate() {
         // Validate factors
-        checkState(factors.length == graph.V());
+        checkState(factors.length == V());
 
         final Map<Var, Set<Var>> factorVariables = newHashMap();
-        for (int i = 0; i < graph.V(); i++) {
+        for (int i = 0; i < V(); i++) {
             Var var = getVar(i);
             HashSet<Var> s = newHashSet(var);
             factorVariables.put(var, s);
@@ -113,16 +113,20 @@ public class BayesianNetwork {
 
     public Set<Var> getVarSet() {
         Set<Var> vars = newHashSet();
-        for (int i = 0; i < graph.V(); i++) {
+        for (int i = 0; i < V(); i++) {
             vars.add(graph.getNode(i));
         }
 
         return Collections.unmodifiableSet(vars);
     }
 
+    public int V() {
+        return graph.V();
+    }
+
     public List<Var> getVarList() {
         ImmutableList.Builder<Var> result = new ImmutableList.Builder<Var>();
-        for (int i = 0; i < graph.V(); i++) {
+        for (int i = 0; i < V(); i++) {
             result = result.add(graph.getNode(i));
         }
 
@@ -156,7 +160,7 @@ public class BayesianNetwork {
 
     @Deprecated
     public Factor query(QueryAlgorithm queryAlgorithm, VarSet query, @Nullable Evidence evidence) {
-        return queryAlgorithm.run(this).query(query, evidence);
+        return queryAlgorithm.prepare(this).query(query, evidence);
 
     }
 
@@ -180,7 +184,7 @@ public class BayesianNetwork {
     }
 
     public Var getVarByName(String varName) {
-        for (int i = 0; i < graph.V(); ++i) {
+        for (int i = 0; i < V(); ++i) {
             if (getVar(i).getName().equals(varName)) return getVar(i);
         }
 

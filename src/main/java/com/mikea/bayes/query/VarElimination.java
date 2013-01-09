@@ -26,7 +26,7 @@ public class VarElimination implements QueryAlgorithm<QueryAlgorithm.Result> {
 
 
     @Override
-    public Result run(final BayesianNetwork network) {
+    public Result prepare(final BayesianNetwork network) {
         return new Result() {
             @Override
             public Factor query(VarSet query, @Nullable Evidence evidence) {

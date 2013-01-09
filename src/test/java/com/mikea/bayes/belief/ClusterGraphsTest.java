@@ -1,7 +1,7 @@
 package com.mikea.bayes.belief;
 
 import com.mikea.bayes.BayesianNetwork;
-import com.mikea.bayes.StudentsNetwork;
+import com.mikea.bayes.data.StudentsNetwork;
 import org.junit.Test;
 
 /**

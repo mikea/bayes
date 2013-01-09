@@ -38,7 +38,7 @@ public abstract class BeliefPropagationAlgorithm implements QueryAlgorithm<Belie
     }
 
     @Override
-    public abstract BPResult run(BayesianNetwork network);
+    public abstract BPResult prepare(BayesianNetwork network);
 
     public static class BPResult extends QueryAlgorithm.Result {
         private final int iterations;

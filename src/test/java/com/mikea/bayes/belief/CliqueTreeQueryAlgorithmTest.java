@@ -3,9 +3,9 @@ package com.mikea.bayes.belief;
 import com.mikea.bayes.BayesianNetwork;
 import com.mikea.bayes.Evidence;
 import com.mikea.bayes.Factor;
-import com.mikea.bayes.StudentsNetwork;
 import com.mikea.bayes.SumProduct;
 import com.mikea.bayes.Var;
+import com.mikea.bayes.data.StudentsNetwork;
 import com.mikea.bayes.query.QueryAlgorithm;
 import com.mikea.bayes.query.VarElimination;
 import org.junit.Test;
@@ -25,8 +25,8 @@ public class CliqueTreeQueryAlgorithmTest {
 
         BayesianNetwork network = StudentsNetwork.buildStudentsNetwork();
 
-        QueryAlgorithm.Result baselineResult = baselineAlgorithm.run(network);
-        QueryAlgorithm.Result actualResult = algorithm.run(network);
+        QueryAlgorithm.Result baselineResult = baselineAlgorithm.prepare(network);
+        QueryAlgorithm.Result actualResult = algorithm.prepare(network);
         double epsilon = 0.001;
 
         for (Var var : network.getVarList()) {

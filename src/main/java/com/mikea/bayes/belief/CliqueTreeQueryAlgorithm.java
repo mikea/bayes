@@ -12,7 +12,7 @@ public class CliqueTreeQueryAlgorithm extends BeliefPropagationAlgorithm {
     }
 
     @Override
-    public BPResult run(BayesianNetwork network) {
+    public BPResult prepare(BayesianNetwork network) {
         return new BPResult(network.getFactors(), CliqueTree.buildCliqueTree(network), iterations);
     }
 }

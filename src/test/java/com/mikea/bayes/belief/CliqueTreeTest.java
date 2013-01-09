@@ -3,10 +3,10 @@ package com.mikea.bayes.belief;
 import com.google.common.collect.Iterables;
 import com.mikea.bayes.BayesianNetwork;
 import com.mikea.bayes.ProbabilitySpace;
-import com.mikea.bayes.StudentsNetwork;
 import com.mikea.bayes.SumProduct;
 import com.mikea.bayes.Var;
 import com.mikea.bayes.VarSet;
+import com.mikea.bayes.data.StudentsNetwork;
 import com.mikea.bayes.io.HuginNetFile;
 import org.junit.Test;
 

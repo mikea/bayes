@@ -13,9 +13,10 @@ import javax.annotation.Nullable;
  * @author mike.aizatsky@gmail.com
  */
 public interface QueryAlgorithm<R extends QueryAlgorithm.Result> {
-    QueryAlgorithm DEFAULT = new VarElimination(new SumProduct.MinNeighborsStrategy());
+    VarElimination VAR_ELIMINATION = new VarElimination(new SumProduct.MinNeighborsStrategy());
+    QueryAlgorithm DEFAULT = VAR_ELIMINATION;
 
-    R run(BayesianNetwork network);
+    R prepare(BayesianNetwork network);
 
     abstract class Result {
         public abstract Factor query(VarSet query, @Nullable Evidence evidence);
@@ -28,6 +29,5 @@ public interface QueryAlgorithm<R extends QueryAlgorithm.Result> {
         public Factor query(VarSet query) {
             return query(query, null);
         }
-
     }
 }

@@ -1,4 +1,9 @@
-package com.mikea.bayes;
+package com.mikea.bayes.data;
+
+import com.mikea.bayes.BayesianNetwork;
+import com.mikea.bayes.Factor;
+import com.mikea.bayes.ProbabilitySpace;
+import com.mikea.bayes.Var;
 
 import static com.mikea.bayes.Factor.newFactor;
 import static com.mikea.bayes.Var.vars;
@@ -8,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author mike.aizatsky@gmail.com
  */
-public class StudentsNetwork {
+public final class StudentsNetwork {
     public static final ProbabilitySpace space = new ProbabilitySpace("StudentsNetwork");
     public static final Var D = space.newVar("D", 2);
     public static final Var I = space.newVar("I", 2);
