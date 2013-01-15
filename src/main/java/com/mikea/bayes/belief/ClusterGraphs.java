@@ -40,7 +40,8 @@ public final class ClusterGraphs {
     }
 
     private static void validateFamilyPreservation(ClusterGraph clusterGraph, Iterable<Factor> factors) {
-        nextFactor: for (Factor factor : factors) {
+        nextFactor:
+        for (Factor factor : factors) {
             for (int v = 0; v < clusterGraph.V(); ++v) {
                 VarSet varSet = clusterGraph.getNode(v);
                 if (varSet.containsAll(factor.getScope())) {
@@ -50,5 +51,19 @@ public final class ClusterGraphs {
 
             throw new IllegalArgumentException("Family preservation property failed.");
         }
+    }
+
+    public static long maxCardinality(ClusterGraph clusterGraph) {
+        long maxCardinality = 0;
+
+        for (int i = 0; i < clusterGraph.V(); ++i) {
+            VarSet varSet = clusterGraph.getNode(i);
+            int cardinality = varSet.getCardinality();
+            if (maxCardinality < cardinality) {
+                maxCardinality = cardinality;
+            }
+        }
+
+        return maxCardinality;
     }
 }

@@ -2,7 +2,6 @@ package com.mikea.bayes;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 import org.gga.graph.maps.DataGraph;
 
@@ -61,29 +60,30 @@ public class Factor {
     public static Factor product(Iterable<Factor> factors) {
         Iterable<VarSet> varSets = Iterables.transform(factors, new Function<Factor, VarSet>() {
             @Override
-            public VarSet apply(@Nullable Factor factor) {
-                assert factor != null;
-                return factor.getScope();
+            public VarSet apply(@Nullable Factor input) {
+                assert input != null;
+                return input.getScope();
             }
         });
 
         VarSet productVarSet = VarSet.union(varSets);
         int numValues = productVarSet.getCardinality();
-        double[] values = new double[numValues];
+        final double[] values = new double[numValues];
 
-        for (int i = 0; i < productVarSet.getCardinality(); ++i) {
-            double value = 1;
+        Arrays.fill(values, 1);
 
-            for (Factor factor : factors) {
-                VarSet varSet = factor.getScope();
-                int j = varSet.transformIndex(i, productVarSet);
-                value *= factor.values[j];
-            }
 
-            values[i] = value;
+        for (final Factor factor : factors) {
+            VarSet varSet = factor.scope;
+            productVarSet.scanWith(varSet, new VarSet.WithScanner() {
+                @Override
+                public void scan(int index1, VarAssignment varAssignment1, int index2, VarAssignment varAssignment2) {
+                    values[index1] *= factor.values[index2];
+                }
+            });
         }
 
-        return Factor.newFactor(productVarSet, values);
+        return newFactor(productVarSet, values);
     }
 
     public static List<VarSet> getScopes(List<Factor> factors) {
@@ -103,7 +103,7 @@ public class Factor {
 
     public String toString(final String valueFormat) {
         return "Factor(" + scope + ", " +
-                Lists.transform(Doubles.asList(values), new Function<Double, Object>() {
+                transform(Doubles.asList(values), new Function<Double, Object>() {
                     @Override
                     public String apply(@Nullable Double input) {
                         return String.format(valueFormat, input);
@@ -230,6 +230,7 @@ public class Factor {
         return new Factor(scope, newValues);
     }
 
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     public double[] getValues() {
         return values;
     }
@@ -300,7 +301,7 @@ public class Factor {
                 List<Factor> edgeFactors = newArrayList();
 
                 for (Factor factor : factors) {
-                    VarSet scope = factor.getScope();
+                    VarSet scope = factor.scope;
                     if (scope.contains(vVar) && scope.contains(wVar)) {
                         edgeFactors.add(factor);
                     }
@@ -328,12 +329,12 @@ public class Factor {
     }
 
     public static class Builder {
-        private VarSet varSet;
-        private double[] values;
+        private VarSet varSet = null;
+        private double[] values = null;
 
         public Builder withVariables(Var[] vars) {
-            this.varSet = newVarSet(vars);
-            this.values = new double[varSet.getCardinality()];
+            varSet = newVarSet(vars);
+            values = new double[varSet.getCardinality()];
             return this;
         }
 
@@ -358,13 +359,13 @@ public class Factor {
         public Builder add(VarAssignment.Builder at, double value) {
             VarAssignment assignment = at.build();
             int idx = varSet.getIndex(assignment);
-            this.values[idx] += value;
+            values[idx] += value;
             return this;
         }
 
         public Builder set(VarAssignment.Builder at, double value) {
             VarAssignment assignment = at.build();
-            this.values[varSet.getIndex(assignment)] = value;
+            values[varSet.getIndex(assignment)] = value;
             return this;
         }
 
@@ -381,7 +382,7 @@ public class Factor {
                 double d = doubles[i];
 
                 VarAssignment a = assignment.set(var, value);
-                this.values[varSet.getIndex(a)] = d;
+                values[varSet.getIndex(a)] = d;
             }
 
             return this;

@@ -6,6 +6,9 @@ import com.mikea.bayes.ProbabilitySpace;
 import com.mikea.bayes.SumProduct;
 import com.mikea.bayes.Var;
 import com.mikea.bayes.VarAssignment;
+import com.mikea.bayes.belief.CliqueTree;
+import com.mikea.bayes.belief.ClusterGraph;
+import com.mikea.bayes.belief.ClusterGraphs;
 import com.mikea.bayes.query.VarElimination;
 
 import javax.xml.stream.XMLEventReader;
@@ -38,7 +41,11 @@ public final class UAI06Test {
         BayesianNetwork network = XBIFReader.read(new FileInputStream("./testData/uai06/BN_0.xbif"), evidenceBuilder);
         VarAssignment evidence = evidenceBuilder.build();
 
-        double probability = new VarElimination(new SumProduct.MinWeightStrategy()).prepare(network).getProbability(evidence);
+        ClusterGraph clusterGraph = CliqueTree.buildCliqueTree(network, new SumProduct.MinFillStrategy());
+        long maxCardinality = ClusterGraphs.maxCardinality(clusterGraph);
+        System.out.println("maxCardinality = " + maxCardinality);
+
+        double probability = new VarElimination(new SumProduct.MinFillStrategy()).prepare(network).getProbability(evidence);
         double score = log(probability);
         System.out.println("score = " + score);
     }

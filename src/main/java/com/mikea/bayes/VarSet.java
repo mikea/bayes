@@ -106,6 +106,24 @@ public class VarSet implements Iterable<Var> {
         return index;
     }
 
+    public void scan(Scanner scanner) {
+        int cardinality = getCardinality();
+        for (int i = 0; i < cardinality; ++i) {
+            scanner.scan(i, getAssignment(i));
+        }
+    }
+
+    public void scanWith(VarSet varSet2, WithScanner scanner) {
+        Preconditions.checkArgument(containsAll(varSet2));
+
+        int cardinality = getCardinality();
+        for (int i = 0; i < cardinality; ++i) {
+            VarAssignment assignment = getAssignment(i);
+            int index2 = varSet2.getIndex(assignment);
+            scanner.scan(i, assignment, index2, varSet2.getAssignment(index2));
+        }
+    }
+
     VarAssignment getAssignment(int idx) {
         Preconditions.checkArgument(idx < getCardinality());
         int[] values = new int[vars.length];
@@ -210,5 +228,13 @@ public class VarSet implements Iterable<Var> {
 
     public boolean containsAll(VarSet other) {
         return set.containsAll(other.set);
+    }
+
+    public interface Scanner {
+        void scan(int index, VarAssignment varAssignment);
+    }
+
+    public interface WithScanner {
+        void scan(int index1, VarAssignment varAssignment1, int index2, VarAssignment varAssignment2);
     }
 }

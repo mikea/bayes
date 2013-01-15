@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -56,7 +57,9 @@ public final class SumProduct {
             }
         }
 
-        result.add(Factor.product(product).marginalize(newVarSet(var)));
+        Factor newFactor = Factor.product(product).marginalize(newVarSet(var));
+        System.out.println("newFactor.getCardinality = " + newFactor.getScope().getCardinality());
+        result.add(newFactor);
         return result;
     }
 
@@ -121,6 +124,36 @@ public final class SumProduct {
                 for (Var var : scope) {
                     costs[var.getIndex()] *= factorCardinality;
                 }
+            }
+        }
+    }
+
+    public static class MinFillStrategy extends GreedyOrderStrategy {
+        @Override
+        public void computeCosts(long[] costs, Set<Var> vars, Iterable<VarSet> factorScopes) {
+            Multimap<Var, Var> neighbors = HashMultimap.create();
+
+            for (VarSet scope : factorScopes) {
+                for (Var var : scope) {
+                    neighbors.putAll(var, scope);
+                }
+            }
+
+            for (Var var : neighbors.keySet()) {
+                Collection<Var> varNeighbors = neighbors.get(var);
+
+                int count = 0;
+                for (Var var1 : varNeighbors) {
+                    for (Var var2 : varNeighbors) {
+                        if (var1.equals(var2) || var1.equals(var) || var2.equals(var)) continue;
+
+                        if (!neighbors.containsEntry(var1, var2)) {
+                            count++;
+                        }
+                    }
+                }
+
+                costs[var.getIndex()] = count / 2;
             }
         }
     }

@@ -1,9 +1,14 @@
 package com.mikea.bayes;
 
+import com.google.common.base.Joiner;
 import org.junit.Test;
 
+import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
 import static com.mikea.bayes.VarSet.newVarSet;
 import static com.mikea.bayes.VarSet.union;
+import static java.util.Collections.sort;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -54,16 +59,16 @@ public class VarSetTest {
     @Test
     public void testGetIndex() throws Exception {
         VarSet v = newVarSet(var1);
-        verifyGetIndex(v);
+        assertGetIndex(v);
 
         v = newVarSet(var1);
-        verifyGetIndex(v);
+        assertGetIndex(v);
 
         v = newVarSet(var0, var3);
-        verifyGetIndex(v);
+        assertGetIndex(v);
     }
 
-    private void verifyGetIndex(VarSet v) {
+    private static void assertGetIndex(VarSet v) {
         for (int i = 0; i < v.getCardinality(); ++i) {
             assertEquals(i, v.getIndex(v.getAssignment(i)));
         }
@@ -71,49 +76,48 @@ public class VarSetTest {
 
     @Test
     public void testAssignmentOrder() throws Exception {
-
         assertEquals(
                 "{1=0}\n" +
-                "{1=1}", getAssignmentOrder(newVarSet(var1)));
+                        "{1=1}", getAssignmentOrder(newVarSet(var1)));
 
         assertEquals(
                 "{2=0, 3=0}\n" +
-                "{2=0, 3=1}\n" +
-                "{2=0, 3=2}\n" +
-                "{2=1, 3=0}\n" +
-                "{2=1, 3=1}\n" +
-                "{2=1, 3=2}",
+                        "{2=0, 3=1}\n" +
+                        "{2=0, 3=2}\n" +
+                        "{2=1, 3=0}\n" +
+                        "{2=1, 3=1}\n" +
+                        "{2=1, 3=2}",
                 getAssignmentOrder(newVarSet(var2, var3)));
 
         assertEquals(
                 "{2=0, 3=0, 4=0}\n" +
-                "{2=0, 3=0, 4=1}\n" +
-                "{2=0, 3=0, 4=2}\n" +
-                "{2=0, 3=0, 4=3}\n" +
-                "{2=0, 3=1, 4=0}\n" +
-                "{2=0, 3=1, 4=1}\n" +
-                "{2=0, 3=1, 4=2}\n" +
-                "{2=0, 3=1, 4=3}\n" +
-                "{2=0, 3=2, 4=0}\n" +
-                "{2=0, 3=2, 4=1}\n" +
-                "{2=0, 3=2, 4=2}\n" +
-                "{2=0, 3=2, 4=3}\n" +
-                "{2=1, 3=0, 4=0}\n" +
-                "{2=1, 3=0, 4=1}\n" +
-                "{2=1, 3=0, 4=2}\n" +
-                "{2=1, 3=0, 4=3}\n" +
-                "{2=1, 3=1, 4=0}\n" +
-                "{2=1, 3=1, 4=1}\n" +
-                "{2=1, 3=1, 4=2}\n" +
-                "{2=1, 3=1, 4=3}\n" +
-                "{2=1, 3=2, 4=0}\n" +
-                "{2=1, 3=2, 4=1}\n" +
-                "{2=1, 3=2, 4=2}\n" +
-                "{2=1, 3=2, 4=3}",
+                        "{2=0, 3=0, 4=1}\n" +
+                        "{2=0, 3=0, 4=2}\n" +
+                        "{2=0, 3=0, 4=3}\n" +
+                        "{2=0, 3=1, 4=0}\n" +
+                        "{2=0, 3=1, 4=1}\n" +
+                        "{2=0, 3=1, 4=2}\n" +
+                        "{2=0, 3=1, 4=3}\n" +
+                        "{2=0, 3=2, 4=0}\n" +
+                        "{2=0, 3=2, 4=1}\n" +
+                        "{2=0, 3=2, 4=2}\n" +
+                        "{2=0, 3=2, 4=3}\n" +
+                        "{2=1, 3=0, 4=0}\n" +
+                        "{2=1, 3=0, 4=1}\n" +
+                        "{2=1, 3=0, 4=2}\n" +
+                        "{2=1, 3=0, 4=3}\n" +
+                        "{2=1, 3=1, 4=0}\n" +
+                        "{2=1, 3=1, 4=1}\n" +
+                        "{2=1, 3=1, 4=2}\n" +
+                        "{2=1, 3=1, 4=3}\n" +
+                        "{2=1, 3=2, 4=0}\n" +
+                        "{2=1, 3=2, 4=1}\n" +
+                        "{2=1, 3=2, 4=2}\n" +
+                        "{2=1, 3=2, 4=3}",
                 getAssignmentOrder(newVarSet(var2, var3, var4)));
     }
 
-    private String getAssignmentOrder(VarSet v) {
+    private static String getAssignmentOrder(VarSet v) {
         StringBuilder order = new StringBuilder();
         for (int i = 0; i < v.getCardinality(); ++i) {
             if (i > 0) order.append("\n");
@@ -130,4 +134,86 @@ public class VarSetTest {
 
         assertEquals("{1}", v1.removeVars(v2).toString());
     }
+
+    @Test
+    public void testScan() throws Exception {
+        assertEquals(
+                " 0 : {1=0}\n" +
+                " 1 : {1=1}", scan(newVarSet(var1)));
+
+        assertEquals(
+                " 0 : {2=0, 3=0}\n" +
+                " 1 : {2=0, 3=1}\n" +
+                " 2 : {2=0, 3=2}\n" +
+                " 3 : {2=1, 3=0}\n" +
+                " 4 : {2=1, 3=1}\n" +
+                " 5 : {2=1, 3=2}", scan(newVarSet(var2, var3)));
+
+        assertEquals(
+                " 0 : {1=0, 2=0, 3=0}\n" +
+                " 1 : {1=0, 2=0, 3=1}\n" +
+                " 2 : {1=0, 2=0, 3=2}\n" +
+                " 3 : {1=0, 2=1, 3=0}\n" +
+                " 4 : {1=0, 2=1, 3=1}\n" +
+                " 5 : {1=0, 2=1, 3=2}\n" +
+                " 6 : {1=1, 2=0, 3=0}\n" +
+                " 7 : {1=1, 2=0, 3=1}\n" +
+                " 8 : {1=1, 2=0, 3=2}\n" +
+                " 9 : {1=1, 2=1, 3=0}\n" +
+                "10 : {1=1, 2=1, 3=1}\n" +
+                "11 : {1=1, 2=1, 3=2}", scan(newVarSet(var1, var2, var3)));
+    }
+
+    @Test
+    public void testScanWith() throws Exception {
+        assertEquals(
+                " 0 : {1=0} -  0 : {1=0}\n" +
+                " 1 : {1=1} -  1 : {1=1}", scanWith(newVarSet(var1), newVarSet(var1)));
+
+
+        assertEquals(
+                " 0 : {1=0, 2=0} -  0 : {1=0}\n" +
+                " 1 : {1=0, 2=1} -  0 : {1=0}\n" +
+                " 2 : {1=1, 2=0} -  1 : {1=1}\n" +
+                " 3 : {1=1, 2=1} -  1 : {1=1}", scanWith(newVarSet(var1, var2), newVarSet(var1)));
+
+        assertEquals(
+                " 0 : {1=0, 2=0, 3=0} -  0 : {1=0, 2=0}\n" +
+                " 1 : {1=0, 2=0, 3=1} -  0 : {1=0, 2=0}\n" +
+                " 2 : {1=0, 2=0, 3=2} -  0 : {1=0, 2=0}\n" +
+                " 3 : {1=0, 2=1, 3=0} -  1 : {1=0, 2=1}\n" +
+                " 4 : {1=0, 2=1, 3=1} -  1 : {1=0, 2=1}\n" +
+                " 5 : {1=0, 2=1, 3=2} -  1 : {1=0, 2=1}\n" +
+                " 6 : {1=1, 2=0, 3=0} -  2 : {1=1, 2=0}\n" +
+                " 7 : {1=1, 2=0, 3=1} -  2 : {1=1, 2=0}\n" +
+                " 8 : {1=1, 2=0, 3=2} -  2 : {1=1, 2=0}\n" +
+                " 9 : {1=1, 2=1, 3=0} -  3 : {1=1, 2=1}\n" +
+                "10 : {1=1, 2=1, 3=1} -  3 : {1=1, 2=1}\n" +
+                "11 : {1=1, 2=1, 3=2} -  3 : {1=1, 2=1}", scanWith(newVarSet(var1, var2, var3), newVarSet(var1, var2)));
+    }
+
+    private static String scan(VarSet v) {
+        final List<String> order = newArrayList();
+        v.scan(new VarSet.Scanner() {
+            @Override
+            public void scan(int index, VarAssignment varAssignment) {
+                order.add(String.format("%2d : %s", index, varAssignment.toString()));
+            }
+        });
+        sort(order);
+        return Joiner.on("\n").join(order);
+    }
+
+    private static String scanWith(VarSet v1, VarSet v2) {
+        final List<String> order = newArrayList();
+        v1.scanWith(v2, new VarSet.WithScanner() {
+            @Override
+            public void scan(int index1, VarAssignment varAssignment1, int index2, VarAssignment varAssignment2) {
+                order.add(String.format("%2d : %s - %2d : %s", index1, varAssignment1.toString(), index2, varAssignment2.toString()));
+            }
+        });
+        sort(order);
+        return Joiner.on("\n").join(order);
+    }
+
 }

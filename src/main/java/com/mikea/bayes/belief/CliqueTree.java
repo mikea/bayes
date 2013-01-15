@@ -29,6 +29,11 @@ public final class CliqueTree {
     }
 
 
+    public static ClusterGraph buildCliqueTree(BayesianNetwork network, SumProduct.VarOrderStrategy strategy) {
+        return buildCliqueTreeFromFactors(network.getVarList(), network.getFactorList(), strategy);
+    }
+
+
     public static ClusterGraph buildCliqueTree(
             Iterable<Var> vars,
             List<Factor> factors) {
