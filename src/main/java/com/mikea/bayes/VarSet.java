@@ -82,14 +82,6 @@ public class VarSet implements Iterable<Var> {
         return (int) result;
     }
 
-    /**
-     * Transform an index from varSet into our own value index.
-     */
-    public int transformIndex(int i, VarSet varSet) {
-        VarAssignment assignment = varSet.getAssignment(i);
-        return getIndex(assignment);
-    }
-
     int getIndex(VarAssignment assignment) {
         Preconditions.checkArgument(assignment.containsAll(vars),
                 "Assignment %s do not match this %s", assignment, this);

@@ -184,12 +184,14 @@ public class Factor {
     public Factor marginalize(VarSet vars) {
         if (vars.isEmpty()) return this;
         VarSet newVarSet = scope.removeVars(vars);
-        double[] newValues = new double[newVarSet.getCardinality()];
+        final double[] newValues = new double[newVarSet.getCardinality()];
 
-        for (int i = 0; i < values.length; ++i) {
-            VarAssignment assignment = scope.getAssignment(i);
-            newValues[newVarSet.getIndex(assignment)] += values[i];
-        }
+        scope.scanWith(newVarSet, new VarSet.WithScanner() {
+            @Override
+            public void scan(int index1, VarAssignment varAssignment1, int index2, VarAssignment varAssignment2) {
+                newValues[index2] += values[index1];
+            }
+        });
 
         return new Factor(newVarSet, newValues);
     }
