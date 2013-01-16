@@ -204,12 +204,14 @@ public class VarSetTest {
         return Joiner.on("\n").join(order);
     }
 
-    private static String scanWith(VarSet v1, VarSet v2) {
+    private static String scanWith(final VarSet v1, final VarSet v2) {
         final List<String> order = newArrayList();
         v1.scanWith(v2, new VarSet.WithScanner() {
             @Override
-            public void scan(int index1, VarAssignment varAssignment1, int index2, VarAssignment varAssignment2) {
-                order.add(String.format("%2d : %s - %2d : %s", index1, varAssignment1.toString(), index2, varAssignment2.toString()));
+            public void scan(int index1, int index2) {
+                VarAssignment v1Assignment = v1.getAssignment(index1);
+                VarAssignment v2Assignment = v2.getAssignment(index2);
+                order.add(String.format("%2d : %s - %2d : %s", index1, v1Assignment, index2, v2Assignment));
             }
         });
         sort(order);

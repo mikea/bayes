@@ -41,6 +41,34 @@ public class VarSet implements Iterable<Var> {
         return union(Arrays.asList(varSets));
     }
 
+    public static VarSet newVarSet(Var...vars) {
+        return new VarSet(vars);
+    }
+
+    public static VarSet newVarSet(Iterable<Var> vars) {
+        return new VarSet(Iterables.toArray(vars, Var.class));
+    }
+
+    public static VarSet newVarSet(Set<Var> vars) {
+        Var[] varArray = vars.toArray(new Var[vars.size()]);
+        Arrays.sort(varArray, Var.BY_NAME);
+        return new VarSet(varArray);
+    }
+
+    public static VarSet intersect(VarSet... varSets) {
+        Set<Var> vars = varSets[0].getVarSet();
+
+        for (int i = 1; i < varSets.length; i++) {
+            VarSet varSet = varSets[i];
+            vars = Sets.intersection(vars, varSet.getVarSet());
+        }
+        return newVarSet(vars);
+    }
+
+    public static VarSet intersect(Iterable<VarSet> varSets) {
+        return intersect(Iterables.toArray(varSets, VarSet.class));
+    }
+
     public VarSet add(Var...vars) {
         return union(this, newVarSet(vars));
     }
@@ -67,10 +95,16 @@ public class VarSet implements Iterable<Var> {
         return result.toString();
     }
 
-
-
     public boolean contains(Var var) {
         return set.contains(var);
+    }
+
+    public int find(Var var) {
+        for (int i = 0; i < vars.length; i++) {
+            if (vars[i].equals(var)) return i;
+        }
+
+        return -1;
     }
 
     public int getCardinality() {
@@ -78,7 +112,7 @@ public class VarSet implements Iterable<Var> {
         for (Var var : this) {
             result *= var.getCardinality();
         }
-        checkState(result < Integer.MAX_VALUE);
+        checkState(result < Integer.MAX_VALUE, "Factor too big: %s (%s)", result, this);
         return (int) result;
     }
 
@@ -99,21 +133,58 @@ public class VarSet implements Iterable<Var> {
     }
 
     public void scan(Scanner scanner) {
+        int[] values = new int[vars.length];
+
+        int[] cardinalities = new int[vars.length];
+        for (int i = 0; i < vars.length; i++) {
+              cardinalities[i] = vars[i].getCardinality();
+        }
+
+        int idx = 0;
         int cardinality = getCardinality();
-        for (int i = 0; i < cardinality; ++i) {
-            scanner.scan(i, getAssignment(i));
+
+        while (true) {
+            scanner.scan(idx, new VarAssignment(vars, values));
+            idx++;
+
+            if (idx == cardinality) {
+                return;
+            }
+
+            int i = vars.length - 1;
+            values[i]++;
+
+            while (values[i] == cardinalities[i]) {
+                values[i-1]++;
+                values[i] = 0;
+                i--;
+            }
         }
     }
 
-    public void scanWith(VarSet varSet2, WithScanner scanner) {
+    public void scanWith(final VarSet varSet2, final WithScanner scanner) {
         Preconditions.checkArgument(containsAll(varSet2));
 
-        int cardinality = getCardinality();
-        for (int i = 0; i < cardinality; ++i) {
-            VarAssignment assignment = getAssignment(i);
-            int index2 = varSet2.getIndex(assignment);
-            scanner.scan(i, assignment, index2, varSet2.getAssignment(index2));
+        final int[] varMapping = new int[varSet2.vars.length];
+        final int[] cardinalities = new int[varSet2.vars.length];
+        for (int i = 0; i < varMapping.length; ++i) {
+            varMapping[i] = find(varSet2.vars[i]);
+            cardinalities[i] = varSet2.vars[i].getCardinality();
         }
+
+        scan(new Scanner() {
+            @Override
+            public void scan(int index, VarAssignment varAssignment) {
+                int index2 = 0;
+                for (int i = 0; i < varMapping.length; ++i) {
+                    int cardinality = cardinalities[i];
+                    int val = varAssignment.getValues()[varMapping[i]];
+                    index2 *= cardinality;
+                    index2 += val;
+                }
+                scanner.scan(index, index2);
+            }
+        });
     }
 
     VarAssignment getAssignment(int idx) {
@@ -143,20 +214,6 @@ public class VarSet implements Iterable<Var> {
     @Override
     public Iterator<Var> iterator() {
         return Arrays.asList(vars).iterator();
-    }
-
-    public static VarSet newVarSet(Var...vars) {
-        return new VarSet(vars);
-    }
-
-    public static VarSet newVarSet(Iterable<Var> vars) {
-        return new VarSet(Iterables.toArray(vars, Var.class));
-    }
-
-    public static VarSet newVarSet(Set<Var> vars) {
-        Var[] varArray = vars.toArray(new Var[vars.size()]);
-        Arrays.sort(varArray, Var.BY_NAME);
-        return new VarSet(varArray);
     }
 
     @Override
@@ -204,20 +261,6 @@ public class VarSet implements Iterable<Var> {
         return intersect(this, varSet);
     }
 
-    public static VarSet intersect(VarSet... varSets) {
-        Set<Var> vars = varSets[0].getVarSet();
-
-        for (int i = 1; i < varSets.length; i++) {
-            VarSet varSet = varSets[i];
-            vars = Sets.intersection(vars, varSet.getVarSet());
-        }
-        return newVarSet(vars);
-    }
-
-    public static VarSet intersect(Iterable<VarSet> varSets) {
-        return intersect(Iterables.toArray(varSets, VarSet.class));
-    }
-
     public boolean containsAll(VarSet other) {
         return set.containsAll(other.set);
     }
@@ -227,6 +270,6 @@ public class VarSet implements Iterable<Var> {
     }
 
     public interface WithScanner {
-        void scan(int index1, VarAssignment varAssignment1, int index2, VarAssignment varAssignment2);
+        void scan(int index1, int index2);
     }
 }

@@ -56,6 +56,7 @@ public class Factor {
         if (factors.size() == 1) return factors.get(0);
         return product((Iterable<Factor>)factors);
     }
+
         // todo: this should be part of FactorProduct?
     public static Factor product(Iterable<Factor> factors) {
         Iterable<VarSet> varSets = Iterables.transform(factors, new Function<Factor, VarSet>() {
@@ -77,7 +78,7 @@ public class Factor {
             VarSet varSet = factor.scope;
             productVarSet.scanWith(varSet, new VarSet.WithScanner() {
                 @Override
-                public void scan(int index1, VarAssignment varAssignment1, int index2, VarAssignment varAssignment2) {
+                public void scan(int index1, int index2) {
                     values[index1] *= factor.values[index2];
                 }
             });
@@ -94,6 +95,58 @@ public class Factor {
                 return checkNotNull(input).getScope();
             }
         });
+    }
+
+    public static Builder withVariables(Var... vars) {
+        return new Builder().withVariables(vars);
+    }
+
+    // todo: move out
+    public static DataGraph<Var, List<Factor>> induceMarkovNetwork(Factor... factors) {
+        VarSet vars = VarSet.union(Iterables.transform(Arrays.asList(factors), new Function<Factor, VarSet>() {
+            @Nullable
+            @Override
+            public VarSet apply(@Nullable Factor input) {
+                return checkNotNull(input).getScope();
+            }
+        }));
+
+        DataGraph<Var, List<Factor>> graph = newDataGraph(Var.class, vars.size(), false);
+
+        int i = 0;
+        for (Var var : vars) {
+            graph.setNode(i, var);
+            ++i;
+        }
+
+        for (int v = 0; v < graph.V(); ++v) {
+            Var vVar = checkNotNull(graph.getNode(v));
+            for (int w = v + 1; w < graph.V(); ++w) {
+                Var wVar = checkNotNull(graph.getNode(w));
+
+                List<Factor> edgeFactors = newArrayList();
+
+                for (Factor factor : factors) {
+                    VarSet scope = factor.scope;
+                    if (scope.contains(vVar) && scope.contains(wVar)) {
+                        edgeFactors.add(factor);
+                    }
+                }
+
+                if (!edgeFactors.isEmpty()) {
+                    checkState(v != w);
+                    graph.insert(v, w, edgeFactors);
+                }
+            }
+        }
+
+        return graph;
+    }
+
+    public static Factor constant(VarSet node, double v) {
+        double[] values = new double[node.getCardinality()];
+        Arrays.fill(values, v);
+        return new Factor(node, values);
     }
 
     @Override
@@ -188,7 +241,7 @@ public class Factor {
 
         scope.scanWith(newVarSet, new VarSet.WithScanner() {
             @Override
-            public void scan(int index1, VarAssignment varAssignment1, int index2, VarAssignment varAssignment2) {
+            public void scan(int index1, int index2) {
                 newValues[index2] += values[index1];
             }
         });
@@ -249,10 +302,6 @@ public class Factor {
         return getValue(builder.build());
     }
 
-    public static Builder withVariables(Var... vars) {
-        return new Builder().withVariables(vars);
-    }
-
     /**
      * Normalize value for every possible assignment of vars.
      */
@@ -278,56 +327,9 @@ public class Factor {
         return true;
     }
 
-    public static DataGraph<Var, List<Factor>> induceMarkovNetwork(Factor... factors) {
-        VarSet vars = VarSet.union(Iterables.transform(Arrays.asList(factors), new Function<Factor, VarSet>() {
-            @Nullable
-            @Override
-            public VarSet apply(@Nullable Factor input) {
-                return checkNotNull(input).getScope();
-            }
-        }));
-
-        DataGraph<Var, List<Factor>> graph = newDataGraph(Var.class, vars.size(), false);
-
-        int i = 0;
-        for (Var var : vars) {
-            graph.setNode(i, var);
-            ++i;
-        }
-
-        for (int v = 0; v < graph.V(); ++v) {
-            Var vVar = checkNotNull(graph.getNode(v));
-            for (int w = v + 1; w < graph.V(); ++w) {
-                Var wVar = checkNotNull(graph.getNode(w));
-
-                List<Factor> edgeFactors = newArrayList();
-
-                for (Factor factor : factors) {
-                    VarSet scope = factor.scope;
-                    if (scope.contains(vVar) && scope.contains(wVar)) {
-                        edgeFactors.add(factor);
-                    }
-                }
-
-                if (!edgeFactors.isEmpty()) {
-                    checkState(v != w);
-                    graph.insert(v, w, edgeFactors);
-                }
-            }
-        }
-
-        return graph;
-    }
-
     public Factor observeEvidence(@Nullable VarAssignment evidence) {
         if (evidence == null) return this;
         return observeEvidence(evidence.getVars(), evidence.getValues());
-    }
-
-    public static Factor constant(VarSet node, double v) {
-        double[] values = new double[node.getCardinality()];
-        Arrays.fill(values, v);
-        return new Factor(node, values);
     }
 
     public static class Builder {
