@@ -57,12 +57,6 @@
         <value />
       </option>
     </inspection_tool>
-    <inspection_tool class="BadExceptionThrown" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="exceptionsString" value="" />
-      <option name="exceptions">
-        <value />
-      </option>
-    </inspection_tool>
     <inspection_tool class="BadOddness" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="BeforeClassOrAfterClassIsPublicStaticVoidNoArg" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="BeforeOrAfterIsPublicVoidNoArg" enabled="true" level="WARNING" enabled_by_default="true" />

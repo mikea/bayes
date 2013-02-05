@@ -3,13 +3,9 @@ package com.mikea.bayes.eval.uai06;
 import com.mikea.bayes.BayesianNetwork;
 import com.mikea.bayes.Factor;
 import com.mikea.bayes.ProbabilitySpace;
-import com.mikea.bayes.SumProduct;
 import com.mikea.bayes.Var;
 import com.mikea.bayes.VarAssignment;
-import com.mikea.bayes.belief.CliqueTree;
-import com.mikea.bayes.belief.ClusterGraph;
-import com.mikea.bayes.belief.ClusterGraphs;
-import com.mikea.bayes.query.VarElimination;
+import com.mikea.bayes.dbg.DbgServer;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -27,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static java.lang.StrictMath.log;
 
 /**
  * http://melodi.ee.washington.edu/~bilmes/uai06InferenceEvaluation/
@@ -41,6 +36,8 @@ public final class UAI06Test {
         BayesianNetwork network = XBIFReader.read(new FileInputStream("./testData/uai06/BN_0.xbif"), evidenceBuilder);
         VarAssignment evidence = evidenceBuilder.build();
 
+        DbgServer.publish(network);
+/*
         ClusterGraph clusterGraph = CliqueTree.buildCliqueTree(network, new SumProduct.MinFillStrategy());
         long maxCardinality = ClusterGraphs.maxCardinality(clusterGraph);
         System.out.println("maxCardinality = " + maxCardinality);
@@ -48,6 +45,9 @@ public final class UAI06Test {
         double probability = new VarElimination(new SumProduct.MinFillStrategy()).prepare(network).getProbability(evidence);
         double score = log(probability);
         System.out.println("score = " + score);
+*/
+
+        DbgServer.join();
     }
 
     private static final class XBIFReader {
