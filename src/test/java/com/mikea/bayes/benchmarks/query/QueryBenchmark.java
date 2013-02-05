@@ -22,7 +22,7 @@ public class QueryBenchmark extends SimpleBenchmark {
     @Param({"cysticFibrosisBayesNet", "cysticFibrosisBayesNetGeneCopy"})
     private String network;
 
-    @Param({"VarElimination.MinNeighbors", "VarElimination.MinWeight"})
+    @Param({"VarElimination.MinNeighbors", "VarElimination.MinWeight", "VarElimination.MinFill"})
     private String algorithm;
 
     private Test test;
@@ -35,6 +35,8 @@ public class QueryBenchmark extends SimpleBenchmark {
             queryAlgorithm = new VarElimination(new SumProduct.MinNeighborsStrategy());
         } else if (algorithm.equals("VarElimination.MinWeight")) {
             queryAlgorithm = new VarElimination(new SumProduct.MinWeightStrategy());
+        } else if (algorithm.equals("VarElimination.MinFill")) {
+            queryAlgorithm = new VarElimination(new SumProduct.MinFillStrategy());
         } else {
             throw new IllegalArgumentException(algorithm);
         }

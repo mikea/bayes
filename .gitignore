@@ -1,6 +1,8 @@
 *.class
 target/
 
+java.hprof.*
+
 # Package Files #
 *.jar
 *.war
