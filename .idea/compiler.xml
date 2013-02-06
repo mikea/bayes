@@ -32,6 +32,10 @@
         <module name="gga" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="bayes" target="1.7" />
+      <module name="gga" target="1.7" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_STRING" value="-Xlint:all" />
