@@ -7,6 +7,7 @@ import com.mikea.bayes.query.QueryAlgorithm;
 import org.gga.graph.Edge;
 import org.gga.graph.Graph;
 import org.gga.graph.impl.DataGraphImpl;
+import org.gga.graph.maps.DataGraph;
 import org.gga.graph.search.dfs.AbstractDfsVisitor;
 import org.gga.graph.util.Pair;
 
@@ -91,8 +92,12 @@ public class BayesianNetwork {
         return new FactorProduct(factors).computeAt(assignment);
     }
 
-    public Graph getGraph() {
+    public Graph getIntGraph() {
         return graph.getIntGraph();
+    }
+
+    public DataGraph<Var, Void> getGraph() {
+        return graph;
     }
 
     public Var getVar(int j) {

@@ -30,7 +30,7 @@ public class DSeparation {
         for (Var observation : observations) {
             observationBitSet.set(network.getVarIndex(observation));
         }
-        BitSet bitSet = findDSeparated(network.getGraph(), network.getVarIndex(sourceVariable), observationBitSet);
+        BitSet bitSet = findDSeparated(network.getIntGraph(), network.getVarIndex(sourceVariable), observationBitSet);
         Set<Var> vars = newHashSet();
         for (int i = bitSet.nextSetBit(0); i >= 0; i = bitSet.nextSetBit(i + 1)) {
             vars.add(network.getVar(i));
@@ -123,14 +123,14 @@ public class DSeparation {
         // TODO: this is not a really efficient algorithm. (see Koller exercise 3.28)
         List<Pair<Var, Var>> result = newArrayList();
 
-        for (int i = 0; i < network.getGraph().V(); ++i) {
+        for (int i = 0; i < network.getIntGraph().V(); ++i) {
             Var v1 = network.getVar(i);
             if (observation.contains(v1)) {
                 continue;
             }
             VarSet dSeparation = findDSeparation(network, v1, observation);
 
-            for (int j = i + 1; j < network.getGraph().V(); j++) {
+            for (int j = i + 1; j < network.getIntGraph().V(); j++) {
                 Var v2 = network.getVar(j);
                 if (observation.contains(v2)) {
                     continue;

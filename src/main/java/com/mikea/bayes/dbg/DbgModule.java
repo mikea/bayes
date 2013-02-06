@@ -1,5 +1,6 @@
 package com.mikea.bayes.dbg;
 
+import com.mikea.bayes.util.TempFiles;
 import dagger.Module;
 import dagger.Provides;
 import freemarker.template.Configuration;
@@ -16,6 +17,7 @@ import javax.inject.Singleton;
         entryPoints = {
                 DbgServer.class,
                 DbgServer.RootHandler.class,
+                TempFiles.class,
         }
 )
 public class DbgModule {

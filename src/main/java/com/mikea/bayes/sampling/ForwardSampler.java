@@ -19,14 +19,14 @@ import static com.google.common.base.Preconditions.checkState;
 public final class ForwardSampler {
     public static VarAssignment sample(BayesianNetwork network) {
         Random random = new Random();
-        Graph graph = network.getGraph();
+        Graph graph = network.getIntGraph();
         int[] vertices = TopologicalSort.sort(graph);
         return sample(network, random, vertices);
     }
 
     public static VarAssignment[] sample(BayesianNetwork network, int samples) {
         Random random = new Random();
-        Graph graph = network.getGraph();
+        Graph graph = network.getIntGraph();
         int[] vertices = TopologicalSort.sort(graph);
         VarAssignment[] result = new VarAssignment[samples];
         for (int i = 0; i < result.length; i++) {
