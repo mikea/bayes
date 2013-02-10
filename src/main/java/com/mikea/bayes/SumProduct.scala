@@ -1,0 +1,126 @@
+package com.mikea.bayes
+
+
+object SumProduct {
+
+  val DEFAULT_STRATEGY = new MinNeighborsStrategy()
+
+  def sumProductVariableElimination(vars: Iterable[Var], factors: List[Factor]): Factor = {
+    sumProductVariableElimination(vars, factors, DEFAULT_STRATEGY)
+  }
+
+  def sumProductVariableElimination(vars: Iterable[Var], factors: List[Factor], strategy: VarOrderStrategy): Factor = {
+    sumProductVariableElimination(ProbabilitySpace.fromVars(vars), vars, factors, strategy)
+  }
+
+  private def sumProductVariableElimination(space: ProbabilitySpace,
+                                            vars: Iterable[Var],
+                                            factors: List[Factor],
+                                            strategy: VarOrderStrategy): Factor = {
+    var varSet: Set[Var] = vars.toSet
+    var currentFactors: List[Factor] = factors
+    while (!varSet.isEmpty) {
+      println("varSet.size() = " + varSet.size)
+      val v = strategy.pickVar(space, varSet, Factor.getScopes(currentFactors))
+      currentFactors = sumProductEliminateVar(currentFactors, v)
+      varSet -= v
+    }
+    Factor.product(currentFactors)
+  }
+
+  private def sumProductEliminateVar(factors: Iterable[Factor], `var`: Var): List[Factor] = ??? /*{
+    val result = newArrayList()
+    val product = newArrayList()
+    for (factor <- factors) {
+      val scope = factor.getScope
+      if (scope.contains(`var`)) {
+        product.add(factor)
+      } else {
+        result.add(factor)
+      }
+    }
+    val newFactor = Factor.product(product).marginalize(newVarSet(`var`))
+    println("newFactor.cardinality = " + newFactor.getScope.cardinality)
+    result.add(newFactor)
+    result
+  }*/
+
+  trait VarOrderStrategy {
+    def pickVar(space: ProbabilitySpace, vars: Set[Var], factorScopes: Iterable[VarSet]): Var
+  }
+
+  abstract class GreedyOrderStrategy extends VarOrderStrategy {
+    def computeCosts(costs: Array[Long], vars: Set[Var], factorScopes: Iterable[VarSet]): Unit
+
+    override def pickVar(space: ProbabilitySpace, vars: Set[Var], factorScopes: Iterable[VarSet]): Var = ???/*{
+      val costs = Array.fill(space.numVars)(1l)
+      computeCosts(costs, vars, factorScopes)
+      var minVar: Var = null
+      var minCost = Long.MaxValue
+      for (v <- vars) {
+        var cost = costs(v.getIndex)
+        if (cost < 0) cost = Long.MaxValue
+        if (cost < minCost) {
+          minCost = cost
+          minVar = v
+        }
+      }
+      println("minCost = " + minCost)
+      println("minVar = " + minVar)
+      assert(minVar != null)
+    }
+  */
+  }
+
+  class MinNeighborsStrategy extends GreedyOrderStrategy {
+    override def computeCosts(costs: Array[Long], vars: Set[Var], factorScopes: Iterable[VarSet]) { ??? }/*{
+      val neighbors = mutable.MultiMap[Var, Var]()
+      for (scope <- factorScopes; `var` <- scope) {
+        neighbors.putAll(`var`, scope)
+      }
+      for (`var` <- neighbors.keySet) {
+        costs(`var`.getIndex) = neighbors.get(`var`).size
+      }
+    }*/
+  }
+
+  class MinWeightStrategy extends GreedyOrderStrategy {
+
+    override def computeCosts(costs: Array[Long], vars: Set[Var], factorScopes: Iterable[VarSet]) {
+/*
+      for (scope <- factorScopes) {
+        val factorCardinality = scope.cardinality
+        checkState(factorCardinality != 0, "Zero cardinality factor: %s", scope)
+        for (`var` <- scope) {
+          costs(`var`.getIndex) *= factorCardinality
+        }
+      }
+*/
+      ???
+    }
+  }
+
+  class MinFillStrategy extends GreedyOrderStrategy {
+
+    override def computeCosts(costs: Array[Long], vars: Set[Var], factorScopes: Iterable[VarSet]) {
+      ???
+/*
+      val neighbors = HashMultimap.create()
+      for (scope <- factorScopes; `var` <- scope) {
+        neighbors.putAll(`var`, scope)
+      }
+      for (`var` <- neighbors.keySet) {
+        val varNeighbors = neighbors.get(`var`)
+        var count = 0
+        for (var1 <- varNeighbors; var2 <- varNeighbors) {
+          if (var1 == var2 || var1 == `var` || var2 == `var`) //continue
+            if (!neighbors.containsEntry(var1, var2)) {
+              count += 1
+            }
+        }
+        costs(`var`.getIndex) = count / 2
+      }
+*/
+    }
+  }
+}

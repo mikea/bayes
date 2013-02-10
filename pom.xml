@@ -10,7 +10,6 @@
 
     <name>bayes</name>
     <url>http://maven.apache.org</url>
-
     <prerequisites>
         <maven>3.0</maven>
      </prerequisites>
@@ -19,6 +18,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <antlr.version>3.5</antlr.version>
         <dagger.version>0.9.1</dagger.version>
+        <java.language.version>1.7</java.language.version>
+        <scala.version>2.10.0</scala.version>
+        <scala.plugin.version>2.15.2</scala.plugin.version>
     </properties>
 
     <dependencies>
@@ -64,11 +66,13 @@
             <artifactId>jetty-server</artifactId>
             <version>8.1.8.v20121106</version>
         </dependency>
+<!--
         <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>dagger</artifactId>
             <version>${dagger.version}</version>
         </dependency>
+-->
         <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>dagger-compiler</artifactId>
@@ -80,6 +84,17 @@
             <artifactId>freemarker</artifactId>
             <version>2.3.19</version>
         </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-compiler</artifactId>
+            <version>${scala.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -88,8 +103,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>${java.language.version}</source>
+                    <target>${java.language.version}</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -114,6 +129,25 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <version>${scala.plugin.version}</version>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                    <args>
+                        <arg>-target:jvm-${java.language.version}</arg>
+                    </args>
+                </configuration>
             </plugin>
         </plugins>
     </build>
