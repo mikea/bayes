@@ -1,7 +1,5 @@
 package com.mikea.bayes
 
-import beans.BeanProperty
-
 
 object VarAssignment {
   def at(`var`: Var, value: Int): Builder = new Builder().at(`var`, value)
@@ -35,7 +33,7 @@ object VarAssignment {
 /**
  * @author mike.aizatsky@gmail.com
  */
-class VarAssignment(@BeanProperty val vars: Seq[Var], val values: Seq[Int])
+class VarAssignment(val vars: Seq[Var], val values: Seq[Int])
   extends Iterable[Var] {
 
   def get(`var`: Var): Int = {

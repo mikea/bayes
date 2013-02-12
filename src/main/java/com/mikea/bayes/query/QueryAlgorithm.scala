@@ -8,6 +8,9 @@ import com.mikea.bayes.VarSet
 //remove if not needed
 
 object QueryAlgorithm {
+  var VAR_ELIMINATION: VarElimination = new VarElimination(new SumProduct.MinNeighborsStrategy())
+  var DEFAULT = VAR_ELIMINATION
+
   abstract class Result {
 
     def query(query: VarSet, evidence: VarAssignment): Factor
@@ -24,9 +27,5 @@ object QueryAlgorithm {
  * @author mike.aizatsky@gmail.com
  */
 trait QueryAlgorithm[R <: QueryAlgorithm.Result] {
-  var VAR_ELIMINATION: VarElimination = new VarElimination(new SumProduct.MinNeighborsStrategy())
-  var DEFAULT = VAR_ELIMINATION
-
   def prepare(network: BayesianNetwork): R
-
 }

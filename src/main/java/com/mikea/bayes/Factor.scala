@@ -249,7 +249,7 @@ class Factor (val scope: VarSet, val values: Array[Double]) {
 
   def getValue(assignment: VarAssignment): Double = values(scope.getIndex(assignment))
 
-  def getValue(vars: Array[Var], values: Array[Int]): Double = {
+  def getValue(vars: Seq[Var], values: Seq[Int]): Double = {
     getValue(new VarAssignment(vars, values))
   }
 
@@ -276,6 +276,6 @@ class Factor (val scope: VarSet, val values: Array[Double]) {
 
   def observeEvidence(evidence: VarAssignment): Factor = {
     if (evidence == null) return this
-    observeEvidence(evidence.getVars, evidence.values)
+    observeEvidence(evidence.vars, evidence.values)
   }
 }

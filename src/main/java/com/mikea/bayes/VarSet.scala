@@ -144,7 +144,6 @@ class VarSet private (val vars: Seq[Var]) extends Iterable[Var] {
   override def iterator: Iterator[Var] = vars.iterator
 
   override def equals(obj: Any): Boolean = {
-    if (this == obj) return true
     if (obj == null) return false
     if (obj.isInstanceOf[VarSet]) {
       val other = obj.asInstanceOf[VarSet]
@@ -162,7 +161,7 @@ class VarSet private (val vars: Seq[Var]) extends Iterable[Var] {
 
   override def size: Int = vars.length
 
-  def getVarSet: Set[Var] = set
+  def varSet: Set[Var] = set
 
   def intersect(varSet: VarSet): VarSet = VarSet.intersect(List(this, varSet))
 

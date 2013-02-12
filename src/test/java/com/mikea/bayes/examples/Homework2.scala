@@ -1,27 +1,26 @@
 package com.mikea.bayes.examples
 
 import org.junit.Test
+import com.mikea.bayes.{IMap, BayesianNetwork, Var, ProbabilitySpace}
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 
 /**
  * @author mike.aizatsky@gmail.com
  */
 class Homework2 {
-  @Test def testImap1 {
-/*
+  @Test def testImap1() {
     val space: ProbabilitySpace = new ProbabilitySpace
     val a: Var = space.newVar("A", 2)
     val b: Var = space.newVar("B", 2)
     val c: Var = space.newVar("C", 2)
     val d: Var = space.newVar("D", 2)
     val g: BayesianNetwork = BayesianNetwork.withVariables(a, b, c, d).edge(a, b).edge(b, c).edge(b, d).build
-    assertEquals("[" + "(A ⊥ C | {B, D}), " + "(A ⊥ C | {B}), " + "(A ⊥ D | {B, C}), " + "(A ⊥ D | {B}), " + "(C ⊥ D | {A, B}), " + "(C ⊥ D | {B})]", IMap.computeIMap(g).toString)
-*/
-    ???
+    assertEquals("[" + "(A ⊥ C | {B, D}), " + "(A ⊥ C | {B}), " + "(A ⊥ D | {B, C}), " + "(A ⊥ D | {B}), " + "(C ⊥ D | {A, B}), " + "(C ⊥ D | {B})]", IMap.computeIMap(g).toString())
   }
 
-  @Test def testImap {
-    ???
-/*
+  @Test def testImap() {
     val space: ProbabilitySpace = new ProbabilitySpace
     val a: Var = space.newVar("A", 2)
     val b: Var = space.newVar("B", 2)
@@ -43,12 +42,9 @@ class Homework2 {
     assertFalse(m.contains(m1))
     assertFalse(m.contains(m2))
     assertTrue(m.contains(m3))
-*/
   }
 
   @Test def testIEquivalent {
-    ???
-/*
     val space: ProbabilitySpace = new ProbabilitySpace
     val a: Var = space.newVar("A", 2)
     val b: Var = space.newVar("B", 2)
@@ -69,6 +65,5 @@ class Homework2 {
     assertFalse(m == m2)
     assertFalse(m == m3)
     assertFalse(m == m4)
-*/
   }
 }

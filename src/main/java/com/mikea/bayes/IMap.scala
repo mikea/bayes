@@ -21,8 +21,8 @@ object IMap {
   }
 
   class Independence(val var1: Var, val var2: Var, val observation: VarSet) {
-    override def toString(): String = {
-      "(" + var1.getName + " ⊥ " + var2.getName + " | " + observation.toString(false) + ")"
+    override def toString: String = {
+      "(" + var1.getName + " ⊥ " + var2.getName + " | " + observation.toString(showCardinalities = false) + ")"
     }
 
     override def equals(that: Any): Boolean = {
@@ -43,9 +43,9 @@ object IMap {
  */
 class IMap private (val independencies: Set[Independence]) {
 
-  override def toString(): String = {
-    val strings = independencies map (i => i.toString)
-    strings.toArray.sorted.toString
+  override def toString: String = {
+    val strings = independencies map (i => i.toString())
+    strings.toArray.sorted.mkString("[", ", ", "]")
   }
 
   def contains(that: IMap): Boolean = {
@@ -53,7 +53,6 @@ class IMap private (val independencies: Set[Independence]) {
   }
 
   override def equals(o: Any): Boolean = {
-    if (this == o) return true
     if (o == null || getClass != o.getClass) return false
     val that = o.asInstanceOf[IMap]
     Objects.equal(independencies, that.independencies)

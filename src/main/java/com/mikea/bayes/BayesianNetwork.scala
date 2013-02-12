@@ -8,6 +8,7 @@ import org.gga.graph.search.dfs.AbstractDfsVisitor
 import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.base.Preconditions.checkState
 import scala.collection.mutable
+import com.mikea.bayes.query.QueryAlgorithm
 
 object BayesianNetwork {
   def withVariables(vars: Var*): Builder = new Builder().withVariables(vars)
@@ -40,7 +41,7 @@ object BayesianNetwork {
       }
       val factorArray = new Array[Factor](size)
       for (i <- 0 until size) {
-        factorArray(i) = factors.get(vars(i)).get
+        factorArray(i) = factors.get(vars(i)).getOrElse(null)
       }
       new BayesianNetwork(g, factorArray)
     }
@@ -123,4 +124,8 @@ class BayesianNetwork private (val graph: DataGraphImpl[Var, Void],
   }
 
   def getFactor(v: Var): Option[Factor] = getVarIndex(v) map (factors(_))
+
+  def query(q: VarSet, evidence: VarAssignment): Factor = {
+    QueryAlgorithm.DEFAULT.prepare(this).query(q, evidence)
+  }
 }

@@ -6,6 +6,7 @@ import com.mikea.bayes.SumProduct
 import com.mikea.bayes.VarAssignment
 import com.mikea.bayes.VarSet
 import com.mikea.bayes.query.QueryAlgorithm.Result
+import scala.collection.mutable
 
 //remove if not needed
 
@@ -21,13 +22,12 @@ class VarElimination(val strategy: SumProduct.VarOrderStrategy) extends QueryAlg
     }
   }
 
-  private def queryImpl(network: BayesianNetwork, query: VarSet, evidence: VarAssignment): Factor = ???/*{
-    val factors = newArrayList()
-    for (factor <- network.getFactors) {
-      factors.add(factor.observeEvidence(evidence))
+  private def queryImpl(network: BayesianNetwork, query: VarSet, evidence: VarAssignment): Factor = {
+    var factors = mutable.ArrayBuffer.empty[Factor]
+    for (factor <- network.factors) {
+      factors += factor.observeEvidence(evidence)
     }
-    val varsToEliminate = Sets.difference(network.varSet, query.varSet)
-    sumProductVariableElimination(varsToEliminate, factors, strategy)
-      .normalize()
-  }*/
+    val varsToEliminate = network.varSet.diff(query.varSet)
+    SumProduct.sumProductVariableElimination(varsToEliminate, factors, strategy).normalize()
+  }
 }
