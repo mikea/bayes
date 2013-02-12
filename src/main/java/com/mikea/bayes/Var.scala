@@ -1,7 +1,6 @@
 package com.mikea.bayes
 
 import java.util.NoSuchElementException
-import beans.BeanProperty
 
 object Var {
 
@@ -25,13 +24,13 @@ object Var {
  * @author mike.aizatsky@gmail.com
  */
 class Var private[bayes] (val space: ProbabilitySpace,
-                          @BeanProperty val index: Int,
-                          @BeanProperty val name: String,
+                          val index: Int,
+                          val name: String,
                           val card: Int,
-                          val stateNames: Array[String]) {
+                          val stateNames: Seq[String]) {
   def cardinality: Int = card
 
-  override def toString(): String = toString(false)
+  override def toString: String = toString(showCardinality = false)
 
   def toString(showCardinality: Boolean): String = {
     if (!showCardinality) name else {
@@ -44,7 +43,7 @@ class Var private[bayes] (val space: ProbabilitySpace,
         result.append(stateNames)
       }
       result.append(")")
-      result.toString
+      result.toString()
     }
   }
 

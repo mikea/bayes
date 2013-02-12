@@ -50,7 +50,7 @@ class VarAssignment(val vars: Seq[Var], val values: Seq[Int])
     for (i <- 0 until vars.length) {
       if (i > 0) result.append(", ")
       val `var` = vars(i)
-      result.append(`var`.getName)
+      result.append(`var`.name)
       result.append("=")
       result.append(`var`.getValue(values(i)))
     }

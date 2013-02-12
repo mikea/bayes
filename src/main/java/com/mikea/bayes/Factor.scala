@@ -90,7 +90,7 @@ object Factor {
       this
     }
 
-    def row(`var`: Var, assignmentBuilder: VarAssignment.Builder, values: Array[Double]): Builder = {
+    def row(`var`: Var, assignmentBuilder: VarAssignment.Builder, values: Seq[Double]): Builder = {
       require(values.length == `var`.cardinality)
       val assignment = assignmentBuilder.build()
       require(!assignment.contains(`var`))
@@ -124,8 +124,8 @@ object Factor {
 
     def row(`var`: Var,
             at: VarAssignment.Builder,
-            valueOrder: Array[String],
-            doubles: Array[Double]): Builder = {
+            valueOrder: Seq[String],
+            doubles: Seq[Double]): Builder = {
       val assignment = at.build()
       for (i <- 0 until valueOrder.length) {
         val value = valueOrder(i)
@@ -143,7 +143,7 @@ class Factor (val scope: VarSet, val values: Array[Double]) {
 
   override def toString: String = { "Factor(" + scope + ", " + values.mkString("[", ", ", "]") + ")" }
 
-  def toString(valueFormat: String): String = { "Factor(" + scope + ", " + values.map(v => valueFormat.format(v)) + ")"
+  def toString(valueFormat: String): String = { "Factor(" + scope + ", " + values.map(v => valueFormat.format(v)).mkString("[", ", ", "]") + ")"
   }
 
   def toStringAsTable(valueFormat: String): String = {

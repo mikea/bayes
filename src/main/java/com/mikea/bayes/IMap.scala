@@ -22,7 +22,7 @@ object IMap {
 
   class Independence(val var1: Var, val var2: Var, val observation: VarSet) {
     override def toString: String = {
-      "(" + var1.getName + " ⊥ " + var2.getName + " | " + observation.toString(showCardinalities = false) + ")"
+      "(" + var1.name + " ⊥ " + var2.name + " | " + observation.toString(showCardinalities = false) + ")"
     }
 
     override def equals(that: Any): Boolean = {

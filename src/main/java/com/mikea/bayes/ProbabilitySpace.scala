@@ -49,7 +49,7 @@ class ProbabilitySpace(val name: String) {
 
   def newVar(name: String, card: Int): Var = newVar(name, card, null)
 
-  def newVar(name: String, card: Int, stateNames: Array[String]): Var = {
+  def newVar(name: String, card: Int, stateNames: Seq[String]): Var = {
     synchronized {
       require(mutable)
 

@@ -119,13 +119,13 @@ class BayesianNetwork private (val graph: DataGraphImpl[Var, Void],
   def getFactorList: List[Factor] = factors.toList
 
   def getVarByName(varName: String): Var = {
-    for (i <- 0 until V if getVar(i).getName == varName) return getVar(i)
+    for (i <- 0 until V if getVar(i).name == varName) return getVar(i)
     throw new NoSuchElementException()
   }
 
   def getFactor(v: Var): Option[Factor] = getVarIndex(v) map (factors(_))
 
-  def query(q: VarSet, evidence: VarAssignment): Factor = {
+  def query(q: VarSet, evidence: VarAssignment = null): Factor = {
     QueryAlgorithm.DEFAULT.prepare(this).query(q, evidence)
   }
 }

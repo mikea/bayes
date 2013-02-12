@@ -59,7 +59,7 @@ object SumProduct {
       var minVar: Var = null
       var minCost = Long.MaxValue
       for (v <- vars) {
-        var cost = costs(v.getIndex)
+        var cost = costs(v.index)
         if (cost < 0) cost = Long.MaxValue
         if (cost < minCost) {
           minCost = cost
@@ -82,7 +82,7 @@ object SumProduct {
       }
 
       for (v <- neighbors.keySet) {
-        costs(v.getIndex) = neighbors.get(v).size
+        costs(v.index) = neighbors.get(v).size
       }
     }
   }
@@ -94,7 +94,7 @@ object SumProduct {
         val factorCardinality = scope.cardinality
         assert(factorCardinality != 0, s"Zero cardinality factor: $scope")
         for (v <- scope) {
-          costs(v.getIndex) *= factorCardinality
+          costs(v.index) *= factorCardinality
         }
       }
     }

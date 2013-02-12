@@ -10,7 +10,7 @@ object VarSet {
     newVarSet(varSets.flatten.toSet)
   }
 
-  def newVarSet(vars: Set[Var]): VarSet = new VarSet(vars.toList.sortBy(v => v.getName))
+  def newVarSet(vars: Set[Var]): VarSet = new VarSet(vars.toList.sortBy(v => v.name))
   def newVarSet(vars: Iterable[Var]): VarSet = new VarSet(vars.toList)
   def apply(vars: Var*): VarSet = new VarSet(vars)
 
