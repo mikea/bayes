@@ -113,7 +113,7 @@ class BayesianNetwork private (val graph: DataGraphImpl[Var, Void],
 
   def V: Int = graph.V
 
-  def varList: List[Var] = graph.nodes
+  def varList: Seq[Var] = graph.nodes
 
   def getFactorList: List[Factor] = factors.toList
 

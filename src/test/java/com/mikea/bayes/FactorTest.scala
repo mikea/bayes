@@ -68,6 +68,14 @@ class FactorTest {
   @Test def testInducedMarkovNetwork() {
     val factors: Array[Factor] = StudentsNetwork.buildStudentsNetwork.factors
     val network: DataGraph[Var, List[Factor]] = Factor.induceMarkovNetwork(factors)
-    assertEquals("DataGraphImpl{isDirected=false, [D, G, I, L, S], [\n" + "    D<->G:[Factor({G, I, D}, [0.3, 0.05, 0.9, 0.5, 0.4, 0.25, 0.08, 0.3, 0.3, 0.7, 0.02, 0.2])]\n" + "    D<->I:[Factor({G, I, D}, [0.3, 0.05, 0.9, 0.5, 0.4, 0.25, 0.08, 0.3, 0.3, 0.7, 0.02, 0.2])]\n" + "    G<->I:[Factor({G, I, D}, [0.3, 0.05, 0.9, 0.5, 0.4, 0.25, 0.08, 0.3, 0.3, 0.7, 0.02, 0.2])]\n" + "    G<->L:[Factor({L, G}, [0.1, 0.4, 0.99, 0.9, 0.6, 0.01])]\n" + "    I<->S:[Factor({S, I}, [0.95, 0.2, 0.05, 0.8])]\n" + "]}", network.toString)
+    assertEquals(
+      "DataGraphImpl{isDirected=false, [D, G, I, L, S], [\n" +
+      "    D<->G:List(Factor({G, I, D}, [0.3, 0.05, 0.9, 0.5, 0.4, 0.25, 0.08, 0.3, 0.3, 0.7, 0.02, 0.2]))\n" +
+      "    D<->I:List(Factor({G, I, D}, [0.3, 0.05, 0.9, 0.5, 0.4, 0.25, 0.08, 0.3, 0.3, 0.7, 0.02, 0.2]))\n" +
+      "    G<->I:List(Factor({G, I, D}, [0.3, 0.05, 0.9, 0.5, 0.4, 0.25, 0.08, 0.3, 0.3, 0.7, 0.02, 0.2]))\n" +
+      "    G<->L:List(Factor({L, G}, [0.1, 0.4, 0.99, 0.9, 0.6, 0.01]))\n" +
+      "    I<->S:List(Factor({S, I}, [0.95, 0.2, 0.05, 0.8]))\n" +
+        "]}",
+      network.toString)
   }
 }
